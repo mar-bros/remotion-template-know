@@ -7,7 +7,8 @@ import {
   spring,
   interpolate,
   Audio,
-  staticFile
+  staticFile,
+  Sequence
 } from "remotion";
 import type { ThemeSchema } from "../types/config";
 import { z } from "zod";
@@ -74,14 +75,14 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     frame > question.durationInFrames - question.transitionDuration;
   const transitionOutOpacity = isTransitioningOut
     ? interpolate(
-        frame,
-        [
-          question.durationInFrames - question.transitionDuration,
-          question.durationInFrames,
-        ],
-        [1, 0], // 透明度从1平滑降到0
-        { extrapolateRight: "clamp", extrapolateLeft: "clamp" }
-      )
+      frame,
+      [
+        question.durationInFrames - question.transitionDuration,
+        question.durationInFrames,
+      ],
+      [1, 0], // 透明度从1平滑降到0
+      { extrapolateRight: "clamp", extrapolateLeft: "clamp" }
+    )
     : 1;
 
   // -- 容器视觉缩放处理 (Scale & Blur interactions) --
@@ -127,13 +128,13 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   // SVG 环形进度倒计时计算
   const timerRadius = isLandscape ? 38 : 45;
   const timerCircumference = 2 * Math.PI * timerRadius;
-  const timerProgress = isCountingDown 
+  const timerProgress = isCountingDown
     ? interpolate(
-        frame,
-        [countdownStartFrame, revealStartFrame],
-        [0, 1],
-        { extrapolateRight: "clamp", extrapolateLeft: "clamp" }
-      )
+      frame,
+      [countdownStartFrame, revealStartFrame],
+      [0, 1],
+      { extrapolateRight: "clamp", extrapolateLeft: "clamp" }
+    )
     : (isRevealed ? 1 : 0);
   const strokeDashoffset = timerCircumference * timerProgress;
 
@@ -155,7 +156,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           </span>
         </div>
       )}
-      
+
       {/* 题目正文 (动态尺寸防爆屏) */}
       <h1
         style={{
@@ -174,16 +175,16 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   );
 
   // 判断图片来源，兼容 URL, data:URL 以及工程内部 public 静态引用
-  const imageSrc = question.image 
+  const imageSrc = question.image
     && (question.image.startsWith("http") || question.image.startsWith("data:"))
-      ? question.image
-      : (question.image ? staticFile(question.image) : null);
+    ? question.image
+    : (question.image ? staticFile(question.image) : null);
 
   // 2. 环境图片区块 (完全拆离由于横竖屏造成的 Flex 和 Position 高度坍塌冲突)
   const QuestionImageBlock = question.image && imageSrc ? (
-    <div style={{ 
-      display: "flex", 
-      alignItems: "center", 
+    <div style={{
+      display: "flex",
+      alignItems: "center",
       justifyContent: "center",
       flex: isLandscape ? "0 1 auto" : "none", // 横屏允许随内容自适应调整比例，且不被强制伸缩
       width: isLandscape ? "auto" : "100%",
@@ -224,10 +225,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
   // 3. 选项列表卡片区块 (被精简大小的毛玻璃包裹层)
   const OptionsListBlock = (
-    <div style={{ 
+    <div style={{
       ...(isLandscape ? glassStyle : {}), // 根据最新反馈，竖屏模式下直接剔除外层共用背景框，使设计更轻量
-      display: "flex", 
-      flexDirection: "column", 
+      display: "flex",
+      flexDirection: "column",
       gap: "1.5vh", // 缩减选项之间的留白，解救长文本溢出局促感 
       // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
       flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
@@ -258,7 +259,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           } else {
             bgColor = "rgba(0,0,0,0.1)"; // 错误选项退场暗化
             outline = `2px solid transparent`; // 保持 2px
-            opacity = 0.3; 
+            opacity = 0.3;
           }
         }
 
@@ -305,20 +306,51 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     </div>
   );
 
+  // 判断并解析音频路径
+  const resolveAudio = (src?: string) => {
+    if (!src) return undefined;
+    if (src.startsWith("http") || src.startsWith("data:")) return src;
+    return staticFile(src);
+  };
+
   return (
     <AbsoluteFill>
-      
-      {/* 声音触发层: 分解了不同时刻的人声与背景提示特效音 */}
-      {globalAudio.questionPopSound && frame === 0 && <Audio src={globalAudio.questionPopSound} />}
-      {globalAudio.countdownSound && isCountingDown && frame === countdownStartFrame && <Audio src={globalAudio.countdownSound} />}
-      {globalAudio.answerRevealSound && frame === revealStartFrame && <Audio src={globalAudio.answerRevealSound} />}
-      {question.voice && <Audio src={question.voice} />}
-      {question.answerVoice && frame === revealStartFrame && <Audio src={question.answerVoice} />}
-      {question.explanationVoice && isExplanation && frame === explanationStartFrame && <Audio src={question.explanationVoice} />}
+
+      {/* 声音触发层: 必须使用 Sequence 包裹 Audio 才能保证在时间轴完整播放，直接条件渲染会导致1帧后静音卸载 */}
+      {globalAudio.questionPopSound && (
+        <Sequence from={0}>
+          <Audio src={resolveAudio(globalAudio.questionPopSound)!} />
+        </Sequence>
+      )}
+      {globalAudio.countdownSound && (
+        <Sequence from={countdownStartFrame} durationInFrames={question.countdownDuration}>
+          <Audio src={resolveAudio(globalAudio.countdownSound)!} />
+        </Sequence>
+      )}
+      {globalAudio.answerRevealSound && (
+        <Sequence from={revealStartFrame}>
+          <Audio src={resolveAudio(globalAudio.answerRevealSound)!} />
+        </Sequence>
+      )}
+      {question.voice && (
+        <Sequence from={0}>
+          <Audio src={resolveAudio(question.voice)!} />
+        </Sequence>
+      )}
+      {question.answerVoice && (
+        <Sequence from={revealStartFrame}>
+          <Audio src={resolveAudio(question.answerVoice)!} />
+        </Sequence>
+      )}
+      {question.explanationVoice && (
+        <Sequence from={explanationStartFrame}>
+          <Audio src={resolveAudio(question.explanationVoice)!} />
+        </Sequence>
+      )}
 
       {/* 居中流式主场景容器 */}
       <div style={containerStyle}>
-        
+
         {/* 增加一个逻辑内包裹层：用于无图横屏时的绝对居中包裹 + 内部左对齐 */}
         <div style={{
           display: "flex",
@@ -328,7 +360,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
         }}>
           {/* 全局位于页面相对靠顶端的问题标题 */}
           {QuestionTitleBlock}
-          
+
           {/* 图片与选项排版区，自动识别原图宽高进行流式对称或上下叠放 */}
           <div style={{
             display: "flex",
@@ -366,18 +398,18 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               fontFamily: theme.fontFamily,
               color: theme.textColor,
               transform: `translateY(${interpolate(explanationSpring, [0, 1], [100, 0])}%)`,
-              opacity: transitionOutOpacity, 
+              opacity: transitionOutOpacity,
             }}
           >
             {/* 抽屉扶手小条装饰 */}
             <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: "1vh" }} />
             <h2 style={{ fontSize: "3vh", margin: 0, color: theme.secondaryColor }}>解析 Explanation</h2>
             <div style={{
-               fontSize: isLandscape ? "2.5vh" : "2.6vh",
-               lineHeight: 1.6,
-               opacity: 0.9,
-               overflowY: "auto", 
-               paddingBottom: "2vh"
+              fontSize: isLandscape ? "2.5vh" : "2.6vh",
+              lineHeight: 1.6,
+              opacity: 0.9,
+              overflowY: "auto",
+              paddingBottom: "2vh"
             }}>
               {question.explanation}
             </div>

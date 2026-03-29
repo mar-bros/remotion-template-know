@@ -1,5 +1,4 @@
-import React from "react";
-import { AbsoluteFill, Sequence, Audio, useVideoConfig } from "remotion";
+import { AbsoluteFill, Sequence, Audio, useVideoConfig, staticFile } from "remotion";
 import { KnowVideoProps } from "../Root";
 import { QuestionScene } from "../components/QuestionScene";
 import { BottomBar } from "../components/BottomBar";
@@ -16,13 +15,22 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
 }) => {
   const { durationInFrames } = useVideoConfig();
 
+  // Helper to resolve audio paths
+  const resolveAudio = (src?: string) => {
+    if (!src) return undefined;
+    if (src.startsWith("http") || src.startsWith("data:")) return src;
+    return staticFile(src);
+  };
+
   // Background Music
   const bgm = globalAudio?.bgMusic ? (
-    <Audio 
-      src={globalAudio.bgMusic} 
-      volume={globalAudio.bgMusicVolume ?? 0.3} 
-      loop 
-    />
+    <Sequence from={0} name="BG Music">
+      <Audio 
+        src={resolveAudio(globalAudio.bgMusic)!} 
+        volume={globalAudio.bgMusicVolume ?? 0.3} 
+        loop 
+      />
+    </Sequence>
   ) : null;
 
   // The final total frames we need before end credits

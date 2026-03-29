@@ -1,6 +1,6 @@
 import "./index.css";
 import React from "react";
-import { getInputProps, Composition } from "remotion";
+import { getInputProps, Composition, staticFile } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { KnowConfigSchema, type KnowConfig } from "./types/config";
 import { buildTimeline, getTotalFrames } from "./utils/timing";
@@ -18,6 +18,13 @@ const calculateMetadata: CalculateMetadataFunction<KnowVideoProps> = async ({
   // Read props override via --props OR default props
   const inputProps = getInputProps();
   const config = KnowConfigSchema.parse({ ...props, ...inputProps });
+
+  // 辅助解析音频路径
+  const resolveAudio = (src?: string) => {
+    if (!src) return "";
+    if (src.startsWith("http") || src.startsWith("data:")) return src;
+    return staticFile(src);
+  };
 
   // Collect all audio srcs that need duration lookup
   const audioSrcs: string[] = [];
@@ -44,7 +51,8 @@ const calculateMetadata: CalculateMetadataFunction<KnowVideoProps> = async ({
   const durations = await Promise.all(
     uniqueAudioSrcs.map(async (src) => {
       try {
-        const dur = await getAudioDurationInSeconds(src);
+        const resolved = resolveAudio(src);
+        const dur = await getAudioDurationInSeconds(resolved);
         return [src, dur] as const;
       } catch {
         console.warn(`[KnowVideo] Could not read audio duration for: ${src}`);
