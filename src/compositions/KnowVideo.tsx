@@ -1,4 +1,4 @@
-import { AbsoluteFill, Sequence, Audio, useVideoConfig, staticFile } from "remotion";
+import { AbsoluteFill, Sequence, Audio, useVideoConfig, staticFile, useCurrentFrame, interpolate } from "remotion";
 import { KnowVideoProps } from "../Root";
 import { QuestionScene } from "../components/QuestionScene";
 import { BottomBar } from "../components/BottomBar";
@@ -13,6 +13,7 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
   resolvedTimeline,
   audioDurations,
 }) => {
+  const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
   // Helper to resolve audio paths
@@ -22,12 +23,22 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
     return staticFile(src);
   };
 
+  const fadeDuration = 60; // 2 seconds fade out at 30fps
+  const baseVolume = globalAudio?.bgMusicVolume ?? 0.3;
+
+  const bgmVolume = interpolate(
+    frame,
+    [durationInFrames - fadeDuration, durationInFrames],
+    [baseVolume, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
   // Background Music
   const bgm = globalAudio?.bgMusic ? (
     <Sequence from={0} name="BG Music">
       <Audio 
         src={resolveAudio(globalAudio.bgMusic)!} 
-        volume={globalAudio.bgMusicVolume ?? 0.3} 
+        volume={bgmVolume} 
         loop 
       />
     </Sequence>
