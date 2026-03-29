@@ -25,6 +25,7 @@ const calculateMetadata: CalculateMetadataFunction<KnowVideoProps> = async ({
   
   config.questions.forEach(q => {
     if (q.voice) audioSrcs.push(q.voice);
+    if (q.answerVoice) audioSrcs.push(q.answerVoice);
     if (q.explanationVoice) audioSrcs.push(q.explanationVoice);
   });
 

@@ -32,7 +32,10 @@ export const buildTimeline = (
     const countdownFrames = Math.max(0, Math.floor(q.countdownSeconds * fps));
 
     // 3. Reveal duration
-    const revealFrames = Math.max(0, Math.floor(q.answerWaitSeconds * fps));
+    let revealFrames = Math.max(0, Math.floor(q.answerWaitSeconds * fps));
+    if (q.answerVoice && audioDurations[q.answerVoice]) {
+      revealFrames = Math.max(revealFrames, Math.floor(audioDurations[q.answerVoice] * fps));
+    }
 
     // 4. Explanation duration
     let explanationFrames = 0;

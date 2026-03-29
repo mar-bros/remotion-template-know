@@ -12,7 +12,7 @@
     "textColor": "#ffffff",
     "backgroundColor": "#0f172a",
     "fontFamily": "Outfit",
-    "bgStyle": "solid"
+    "bgStyle": "universe"
   },
   "globalAudio": {},
   "branding": {
@@ -35,6 +35,7 @@
   "questions": [
     {
       "question": "Your blood alcohol concentration (BAC) level is .15 which is well over the limit. What is the risk of crashing if you drive?",
+      "image": "https://picsum.photos/seed/marbro/600/400",
       "options": [
         {
           "id": "A",
@@ -48,30 +49,32 @@
         },
         {
           "id": "C",
-          "text": "Your risk of crashing is greatly increased compared to a BAC at the legal limit.",
+          "text": "Your risk of crashing is greatly increased compared to a BAC at the legal limit.Your risk of crashing is greatly increased compared to a BAC at the legal limit.",
           "isCorrect": true
         }
       ],
       "countdownSeconds": 5,
       "answerWaitSeconds": 3,
-      "explanation": "Paris is the capital of France. It is well known for the Eiffel Tower."
+      "explanation": "Extremely high BAC reduces coordination severely. The risk of a fatal crash goes up drastically compared to lower BAC limits.",
+      "answerVoice": "",
+      "explanationVoice": ""
     },
     {
       "question": "Which planet is known as the Red Planet?",
       "options": [
         {
           "id": "A",
-          "text": "Venus",
+          "text": "Your risk of crashing is greatly increased compared to a BAC at the legal limit.Your risk of crashing is greatly increased compared to a BAC at the legal limit.",
           "isCorrect": false
         },
         {
           "id": "B",
-          "text": "Mars",
+          "text": "Mars (The Red Desert)",
           "isCorrect": true
         },
         {
           "id": "C",
-          "text": "Jupiter",
+          "text": "Jupiter (The Gas Giant)",
           "isCorrect": false
         }
       ],
