@@ -2,6 +2,23 @@ import { z } from "zod";
 import { zColor } from "@remotion/zod-types";
 
 // meta parameter schema (全局视频视频元数据)
+export const IntroSchema = z.object({
+  /** 是否开启首屏介绍功能 */
+  show: z.boolean().default(false),
+  /** 主标题文本 */
+  title: z.string().optional(),
+  /** 副标题或作者/出处描述 */
+  subtitle: z.string().optional(),
+  /** 多行详细描述内容，按行排列 */
+  description: z.array(z.string()).optional(),
+  /** 背景素材类型: "image" (图), "video" (视频), "none" (使用默认视频背景风格) */
+  bgType: z.enum(["image", "video", "none"]).default("none"),
+  /** 背景素材路径 (本地 public 或 HTTP) */
+  bgAsset: z.string().optional(),
+  /** 首屏介绍的展示时长 (秒) */
+  duration: z.number().min(0).default(3),
+});
+
 export const MetaSchema = z.object({
   /** 视频帧率，建议使用 30 或 60 */
   fps: z.number().int().min(1).default(30),
@@ -108,6 +125,8 @@ export const QuestionSchema = z.object({
 // 整个视频的根级 Config Schema
 export const KnowConfigSchema = z.object({
   meta: MetaSchema.default({ fps: 30, width: 1080, height: 1920 }),
+  /** 可选的首屏介绍页面配置 */
+  intro: IntroSchema.default({ show: false, bgType: "none", duration: 3 }),
   theme: ThemeSchema.default({
     primaryColor: "#3b82f6",
     secondaryColor: "#1e40af",

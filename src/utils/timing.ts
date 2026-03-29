@@ -13,9 +13,10 @@ export type ResolvedQuestion = QuestionConfig & {
 export const buildTimeline = (
   questions: QuestionConfig[],
   audioDurations: Record<string, number>,
-  fps: number
+  fps: number,
+  introDurationSeconds: number = 0
 ): ResolvedQuestion[] => {
-  let currentFrame = 0;
+  let currentFrame = Math.floor(introDurationSeconds * fps);
   const TRANSITION_FRAMES = 15; // half second transition between questions
 
   return questions.map((q, index) => {

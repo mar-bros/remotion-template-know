@@ -4,6 +4,17 @@
     "width": 1920,
     "height": 1080
   },
+  "intro": {
+    "show": true,
+    "title": "Test Your Knowledge",
+    "subtitle": "Vicroads Driver License (维州驾考题目)",
+    "description": [
+      "Drive safe, save lives"
+    ],
+    "bgType": "video",
+    "bgAsset": "2165-155327596.mp4",
+    "duration": 3
+  },
   "theme": {
     "primaryColor": "#3b82f6",
     "secondaryColor": "#1e40af",

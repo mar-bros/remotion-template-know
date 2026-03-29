@@ -63,7 +63,8 @@ const calculateMetadata: CalculateMetadataFunction<KnowVideoProps> = async ({
 
   const audioDurations = Object.fromEntries(durations);
 
-  const resolvedTimeline = buildTimeline(config.questions, audioDurations, config.meta.fps);
+  const introDurationSeconds = config.intro?.show ? config.intro.duration : 0;
+  const resolvedTimeline = buildTimeline(config.questions, audioDurations, config.meta.fps, introDurationSeconds);
   const totalFrames = Math.max(
     getTotalFrames(resolvedTimeline, config.endCredits.duration, config.meta.fps),
     1

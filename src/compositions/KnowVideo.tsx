@@ -4,6 +4,7 @@ import { QuestionScene } from "../components/QuestionScene";
 import { BottomBar } from "../components/BottomBar";
 import { EndCredits } from "../components/EndCredits";
 import { Background } from "../components/Background";
+import { IntroScene } from "../components/IntroScene";
 
 export const KnowVideo: React.FC<KnowVideoProps> = ({
   theme,
@@ -12,9 +13,12 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
   endCredits,
   resolvedTimeline,
   audioDurations,
+  intro,
 }) => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
+  const { durationInFrames, fps } = useVideoConfig();
+
+  const introDurationFrames = Math.floor((intro?.show ? intro.duration : 0) * fps);
 
   // Helper to resolve audio paths
   const resolveAudio = (src?: string) => {
@@ -56,6 +60,12 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
       {bgm}
 
       <Background theme={theme} />
+
+      {intro?.show && (
+        <Sequence from={0} durationInFrames={introDurationFrames} name="Intro">
+          <IntroScene config={intro} theme={theme} />
+        </Sequence>
+      )}
 
       <AbsoluteFill>
         {resolvedTimeline.map((q, index) => {
