@@ -1,54 +1,63 @@
-# Remotion video
+# remotion-template-know
 
-<p align="center">
-  <a href="https://github.com/remotion-dev/logo">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-dark.apng">
-      <img alt="Animated Remotion Logo" src="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-light.gif">
-    </picture>
-  </a>
-</p>
+## prompt
+### round 1
+```
+这是一个使用 Remotion 刚刚初始化的空项目。
 
-Welcome to your Remotion project!
+请根据以下要求，帮我初始化这个项目，便于我参数化、批量化的生成视频。
 
-## Commands
+- 视频场景： 问答系统
+  - 视频中会展示一个问题、问题的选项、问题相关的图片可选，展示题目的时候，支持可选配置 Voice 和 bgImage
+  - 出现问题后，开始倒计时，倒计时结束，展示答案
+  - 选项中有会有一个或多个答案，其他是错误的，展示答案时，将答案的选项高亮
+  - 答案停留一段时间，后面是答案的解释时间，不过这部分可选
+  - 整个过程支持响应式布局，同时适用横屏与竖屏的场景，布局：题目、图片（可选）、选项
 
-**Install Dependencies**
+- 视频参数化
+  - 以上问答的形式，通过参数的配置，可以生成不同的视频
+  - 默认需要生成一个静态的 props.json 文件，包含一个问答的参数
+  - 可以通过 getInputProps 读取实际的动态参数，覆盖默认的 props.json 静态文件
+  - 一个 props.json 会包含多个题目，每个题目遵循 “视频场景” 的流程
+  - 多个题目之间要有转场，要有间隔时间，如果只有一个题目，则不需要转场
 
-```console
-npm i
+- 其他特性
+  - 支持背景全局背景音乐
+  - 题目出现 以及 倒计时的时候要支持自定义音效
+  - 页面变动的时候最好有炫酷的动效效果，风格有一定的专业性，也可以通过参数自定义风格，动态控制风格
+  - 底部 和 视频结尾支持声明版权，参考 `../remotion-template-bit-warm` 这个项目
+
+```
+### round 2
+```
+风格优化
+- 风格有点俗气，需要更专业、更酷炫
+- 标题和选项可以加点背景，包括选项前面的 A/b/C 都可以统一下效果
+- 倒计时放在问题上方的中间，现在的效果有点小气
+- 答案解析从下方类似于抽屉一样抽出，现有的问题和选项弱化隐藏，类似与 Safari 打印预览
+- 默认背景增加一个宇宙的深邃效果，可以备选一种样式，通过参数进行选择，也可以已定义视频互评图片
+
+问题
+- 最后的版权信息是空的，没显示出来
+
 ```
 
-**Start Preview**
+## 本地运行
+```bash
+npm install && npm run dev
 
-```console
-npm run dev
-```
-
-**Render video**
-
-```console
+# 渲染视频
 npx remotion render
 ```
 
-**Upgrade Remotion**
+## 效果
 
-```console
-npx remotion upgrade
-```
+<video src="https://github.com/user-attachments/assets/9064c11f-b523-4033-8eaf-0a1d78b0b25d" width="100%" controls>
+  您的浏览器不支持视频播放。
+</video>
 
 ## Docs
 
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+- Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
+- We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
+- Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
