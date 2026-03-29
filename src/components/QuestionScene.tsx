@@ -110,7 +110,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     zIndex: 10,
     transform: `scale(${containerScale})`, // 取消初始的向上滑动动效(translateY)以免造成视觉未对齐的迟钝感
     filter: `brightness(${containerDim}) blur(${containerBlur}px)`,
-    transition: "transform 0.1s linear, filter 0.1s linear",
+    // 注意：绝对不能在 Remotion 里写 transition: all 或者 filter！由于是逐帧截取，Chromium 补帧会和外框渲染严重打架产生抖动！
   };
 
   // 毛玻璃卡片的基础样式 (仅包裹内部需要的核心元素，不再无脑拉伸变大)
@@ -141,7 +141,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
   // 1. 顶部标题区块 (SVG倒计时球 + 大字号题目文本)
   const QuestionTitleBlock = (
-    <div style={{ display: "flex", alignItems: isLandscapeNoImage ? "center" : "center", gap: "3vh", flexDirection: isLandscape ? "row" : "column", width: "100%", marginBottom: "50px" }}>
+    <div style={{ display: "flex", alignItems: isLandscapeNoImage ? "center" : "center", gap: "2vh", flexDirection: isLandscape ? "row" : "column", width: "100%", marginBottom: isLandscape ? "4vh" : "2vh" }}>
       {/* 倒计时 */}
       {question.countdownSeconds > 0 && (
         <div style={{ position: "relative", width: timerRadius * 2.2, height: timerRadius * 2.2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -159,7 +159,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       {/* 题目正文 (动态尺寸防爆屏) */}
       <h1
         style={{
-          fontSize: isLandscape ? "4.5vh" : "4.0vh",
+          fontSize: isLandscape ? "4.5vh" : "3.6vh", // 适当缩减竖屏标题字号，为超长题库让出安全区
           fontWeight: 800,
           lineHeight: 1.4,
           textShadow: "0 4px 12px rgba(0,0,0,0.6)",
@@ -188,7 +188,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       flex: isLandscape ? "0 1 auto" : "none", // 横屏允许随内容自适应调整比例，且不被强制伸缩
       width: isLandscape ? "auto" : "100%",
       position: "relative",
-      marginTop: isLandscape ? 0 : "3vh", // 竖屏留白
+      marginTop: isLandscape ? 0 : "1vh", // 竖屏稍微留白，避免截断
     }}>
       {isLandscape ? (
         /* 横屏：恢复自然原图比例约束，避免 cover 强行截断造成误导 */
@@ -211,7 +211,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           src={imageSrc}
           style={{
             maxWidth: "100%",
-            maxHeight: "28vh", // 防止巨幅长图撑塌竖向排版
+            maxHeight: "22vh", // 将竖屏下图片最高占用从 28vh 下压到 22vh，为恐怖长度的选项腾出巨大空间
             objectFit: "contain",
             borderRadius: "16px",
             boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
@@ -228,7 +228,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       ...(isLandscape ? glassStyle : {}), // 根据最新反馈，竖屏模式下直接剔除外层共用背景框，使设计更轻量
       display: "flex", 
       flexDirection: "column", 
-      gap: "2vh", 
+      gap: "1.5vh", // 缩减选项之间的留白，解救长文本溢出局促感 
       // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
       flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
       width: isLandscapeNoImage ? "100%" : "auto", // 除了横屏没图片强制霸占整栏，其余全部自然收缩包裹文字或者利用flex拉伸
@@ -245,18 +245,19 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
         });
 
         let bgColor = "rgba(255,255,255,0.02)";
-        let outline = `1px solid rgba(255,255,255,0.1)`;
+        // 在此处永远保持为 2px border! 避免变色时由于边框从 1px 涨到 2px 而带来的整体布局错位（会导致上下选项全盘疯狂抖动颤抖）
+        let outline = `2px solid rgba(255,255,255,0.1)`;
         let opacity = 1;
         let badgeBg = `linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%)`;
 
         if (isRevealed) {
           if (opt.isCorrect) {
             bgColor = `${theme.correctColor}33`; // 答对选项绿光背景
-            outline = `2px solid ${theme.correctColor}`;
+            outline = `2px solid ${theme.correctColor}`; // 保持 2px
             badgeBg = theme.correctColor;
           } else {
             bgColor = "rgba(0,0,0,0.1)"; // 错误选项退场暗化
-            outline = `1px solid transparent`;
+            outline = `2px solid transparent`; // 保持 2px
             opacity = 0.3; 
           }
         }
@@ -265,19 +266,18 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           <div
             key={opt.id}
             style={{
-              padding: isLandscape ? "1.8vh 2vw" : "2.5vh 3.5vw", // 微调竖屏选项内边距比例，修复压迫感
+              padding: isLandscape ? "1.8vh 2vw" : "2vh 3vw", // 再次极限瘦身竖屏的上下内边距，防截断
               borderRadius: "16px",
               background: bgColor,
               border: outline,
-              fontSize: isLandscape ? "2.6vh" : "2.8vh",
+              fontSize: isLandscape ? "2.6vh" : "2.6vh", // 统一竖屏字体
               fontWeight: 600,
               opacity: optionEnter * opacity,
               display: "flex",
               alignItems: "center",
               gap: "2vh",
               boxShadow: isRevealed && opt.isCorrect ? `0 0 30px ${theme.correctColor}55` : "none",
-              // 关键修复：CSS Transition 不能应用在所有属性上(all)，否则会与 Remotion 逐帧计算的 opacity/transform 发生打架，导致明显拖影和延迟错位。只过渡颜色和阴影！
-              transition: "background 0.3s ease, box-shadow 0.3s ease, border 0.3s ease, color 0.3s ease", 
+              // 绝对禁止在这里写 transition! Remotion 的非实时性会导致 transition 失帧引起选项肉眼可见的鬼畜抖动！
             }}
           >
             {/* 左侧的 A/B/C 悬浮圆球设计 */}
@@ -293,7 +293,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               color: isRevealed && opt.isCorrect ? "#FFF" : theme.primaryColor,
               boxShadow: "inset 0 2px 4px rgba(255,255,255,0.2)",
               border: "1px solid rgba(255,255,255,0.1)",
-              transition: "all 0.5s ease",
+              // 关键：彻底剔除 A/B/C 圆球的 transition，防止 Remotion 渲染抽搐！
             }}>
               {opt.id}
             </div>
