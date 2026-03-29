@@ -4,6 +4,7 @@ import { KnowVideoProps } from "../Root";
 import { QuestionScene } from "../components/QuestionScene";
 import { BottomBar } from "../components/BottomBar";
 import { EndCredits } from "../components/EndCredits";
+import { Background } from "../components/Background";
 
 export const KnowVideo: React.FC<KnowVideoProps> = ({
   theme,
@@ -35,6 +36,8 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
     <AbsoluteFill style={{ backgroundColor: theme.backgroundColor }}>
       {bgm}
 
+      <Background theme={theme} />
+
       <AbsoluteFill>
         {resolvedTimeline.map((q, index) => {
           // A question overlaps with the next by question.transitionDuration frames.
@@ -55,11 +58,9 @@ export const KnowVideo: React.FC<KnowVideoProps> = ({
         })}
       </AbsoluteFill>
 
-      {/* End Credits Sequence */}
+      {/* End Credits - Removed Sequence wrapper so global timeline frame subtraction works */}
       {endCredits && endCredits.items.length > 0 && creditsStartFrame < durationInFrames && (
-        <Sequence from={creditsStartFrame} name="EndCredits">
-          <EndCredits config={endCredits} startFrame={creditsStartFrame} />
-        </Sequence>
+        <EndCredits config={endCredits} startFrame={creditsStartFrame} />
       )}
 
       {/* Persistent Bottom Bar */}

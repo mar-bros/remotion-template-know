@@ -34,7 +34,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
   const isLandscape = width > height;
 
-  // Determine Timeline phases
+  // -- Timeline Phases --
   const countdownStartFrame = question.enterDuration;
   const revealStartFrame = countdownStartFrame + question.countdownDuration;
   const explanationStartFrame = revealStartFrame + question.revealDuration;
@@ -44,15 +44,18 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   const isExplanation = frame >= explanationStartFrame;
 
   // -- Animations --
-  
-  // Enter transition opacity & scale
   const enterProgress = spring({
     frame,
     fps,
-    config: { damping: 12 },
+    config: { damping: 14, mass: 0.8 },
   });
 
-  // Fade out during transition (if we are the outgoing question)
+  const explanationSpring = spring({
+    frame: frame - explanationStartFrame,
+    fps,
+    config: { damping: 14, mass: 0.8 },
+  });
+
   const isTransitioningOut =
     frame > question.durationInFrames - question.transitionDuration;
   const transitionOutOpacity = isTransitioningOut
@@ -67,22 +70,38 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       )
     : 1;
 
-  // Layout Styles
+  // Main Container scales down dynamically during explanation
+  const containerScale = interpolate(explanationSpring, [0, 1], [1, 0.85]);
+  const containerBlur = interpolate(explanationSpring, [0, 1], [0, 4]); // backdrop blur effect
+  const containerDim = interpolate(explanationSpring, [0, 1], [1, 0.4]);
+
   const containerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: isLandscape ? "row" : "column",
     width: "100%",
     height: "100%",
-    padding: "4% 8%",
+    padding: isLandscape ? "4% 8%" : "8% 6%",
     boxSizing: "border-box",
-    alignItems: "center",
+    alignItems: "stretch",
     justifyContent: "center",
     gap: "5%",
     opacity: transitionOutOpacity,
     fontFamily: theme.fontFamily,
     color: theme.textColor,
     zIndex: 10,
-    transform: `scale(${interpolate(enterProgress, [0, 1], [0.95, 1])})`,
+    transform: `scale(${containerScale})`,
+    filter: `brightness(${containerDim}) blur(${containerBlur}px)`,
+    transition: "transform 0.1s linear, filter 0.1s linear",
+  };
+
+  // Glassmorphism block styles
+  const glassStyle: React.CSSProperties = {
+    background: "rgba(255, 255, 255, 0.04)",
+    backdropFilter: "blur(24px)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+    borderRadius: "24px",
+    padding: isLandscape ? "4vh 3vw" : "3vh 5vw",
   };
 
   const textPanelStyle: React.CSSProperties = {
@@ -90,8 +109,6 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    height: "100%",
-    width: "100%",
   };
 
   const imagePanelStyle: React.CSSProperties = {
@@ -99,8 +116,21 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     display: question.image ? "flex" : "none",
     alignItems: "center",
     justifyContent: "center",
-    maxHeight: isLandscape ? "100%" : "40%",
+    maxHeight: isLandscape ? "100%" : "30%",
   };
+
+  // Timer Math
+  const timerRadius = isLandscape ? 40 : 50;
+  const timerCircumference = 2 * Math.PI * timerRadius;
+  const timerProgress = isCountingDown 
+    ? interpolate(
+        frame,
+        [countdownStartFrame, revealStartFrame],
+        [0, 1],
+        { extrapolateRight: "clamp", extrapolateLeft: "clamp" }
+      )
+    : (isRevealed ? 1 : 0);
+  const strokeDashoffset = timerCircumference * timerProgress;
 
   return (
     <AbsoluteFill>
@@ -125,26 +155,60 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
         <Audio src={question.explanationVoice} />
       )}
 
+      {/* Main Scalable Content Wrapper */}
       <div style={containerStyle}>
         
-        {/* Question Text Panel */}
-        <div style={textPanelStyle}>
-          <h1
-            style={{
-              fontSize: isLandscape ? "4vw" : "6vw",
-              fontWeight: "bold",
-              marginBottom: "4vh",
-              lineHeight: 1.2,
-              textShadow: "0 4px 12px rgba(0,0,0,0.5)",
-            }}
-          >
-            {question.question}
-          </h1>
+        {/* Top Centered Timer & Title area */}
+        <div style={{...textPanelStyle, gap: "3vh", transform: `translateY(${interpolate(enterProgress, [0, 1], [40, 0])}px)`, opacity: enterProgress}}>
+          
+          {/* Centered Countdown */}
+          <div style={{ display: "flex", alignItems: "center", gap: "2vh", marginBottom: "1vh" }}>
+            <div style={{ position: "relative", width: timerRadius * 2.2, height: timerRadius * 2.2, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width={timerRadius * 2.2} height={timerRadius * 2.2} style={{ position: "absolute", transform: "rotate(-90deg)" }}>
+                <circle
+                  cx={timerRadius * 1.1}
+                  cy={timerRadius * 1.1}
+                  r={timerRadius}
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="8"
+                  fill="none"
+                />
+                <circle
+                  cx={timerRadius * 1.1}
+                  cy={timerRadius * 1.1}
+                  r={timerRadius}
+                  stroke={theme.primaryColor}
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={timerCircumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span style={{ fontSize: isLandscape ? "2.5vh" : "3.5vh", fontWeight: "bold", fontFamily: theme.fontFamily }}>
+                {isRevealed ? "0" : Math.max(0, Math.ceil((question.countdownDuration - (frame - countdownStartFrame)) / fps))}
+              </span>
+            </div>
+            
+            {/* Title */}
+            <h1
+              style={{
+                fontSize: isLandscape ? "4vh" : "5vh",
+                fontWeight: 800,
+                lineHeight: 1.3,
+                textShadow: "0 4px 12px rgba(0,0,0,0.6)",
+                margin: 0,
+                flex: 1
+              }}
+            >
+              {question.question}
+            </h1>
+          </div>
 
-          {/* Options List */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "2vh" }}>
+          {/* Options Glassmorphism Container */}
+          <div style={{ ...glassStyle, display: "flex", flexDirection: "column", gap: "2vh" }}>
             {question.options.map((opt, i) => {
-              const staggerFrames = 5 * i;
+              const staggerFrames = 4 * i;
               const optionEnter = spring({
                 frame: frame - staggerFrames,
                 fps,
@@ -152,18 +216,20 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               });
 
               // Reveal Colors
-              let bgColor = "rgba(255,255,255,0.1)";
-              let outline = `2px solid ${theme.primaryColor}`;
+              let bgColor = "rgba(255,255,255,0.03)";
+              let outline = `1px solid rgba(255,255,255,0.1)`;
               let opacity = 1;
+              let badgeBg = `linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%)`;
 
               if (isRevealed) {
                 if (opt.isCorrect) {
-                  bgColor = theme.correctColor;
+                  bgColor = `${theme.correctColor}22`; // 22 is hex alpha
                   outline = `2px solid ${theme.correctColor}`;
+                  badgeBg = theme.correctColor;
                 } else {
-                  bgColor = "rgba(255,255,255,0.05)";
-                  outline = `2px solid transparent`;
-                  opacity = 0.5;
+                  bgColor = "rgba(0,0,0,0.1)";
+                  outline = `1px solid transparent`;
+                  opacity = 0.4;
                 }
               }
 
@@ -171,52 +237,45 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                 <div
                   key={opt.id}
                   style={{
-                    padding: "2vh 3vh",
+                    padding: isLandscape ? "1.5vh 2vw" : "2vh 4vw",
                     borderRadius: "16px",
                     background: bgColor,
                     border: outline,
-                    fontSize: isLandscape ? "2vw" : "4vw",
-                    fontWeight: 500,
+                    fontSize: isLandscape ? "3vh" : "3.5vh",
+                    fontWeight: 600,
                     opacity: optionEnter * opacity,
                     transform: `translateY(${interpolate(optionEnter, [0, 1], [20, 0])}px)`,
                     display: "flex",
                     alignItems: "center",
                     gap: "2vh",
-                    boxShadow: isRevealed && opt.isCorrect ? `0 0 30px ${theme.correctColor}88` : "none",
+                    boxShadow: isRevealed && opt.isCorrect ? `0 0 30px ${theme.correctColor}66` : "none",
                     transition: "all 0.4s ease",
                   }}
                 >
-                  <span style={{ fontWeight: "bold", color: theme.primaryColor }}>
-                    {opt.id}.
-                  </span>
+                  {/* Badge */}
+                  <div style={{
+                    minWidth: isLandscape ? "5vh" : "6vh",
+                    height: isLandscape ? "5vh" : "6vh",
+                    borderRadius: "50%",
+                    background: badgeBg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 800,
+                    boxShadow: "inset 0 2px 4px rgba(255,255,255,0.2)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    transition: "all 0.4s ease",
+                  }}>
+                    {opt.id}
+                  </div>
                   <span>{opt.text}</span>
                 </div>
               );
             })}
           </div>
-
-          {/* Explanation Text */}
-          {isExplanation && question.explanation && (
-            <div
-              style={{
-                marginTop: "4vh",
-                padding: "3vh",
-                background: "rgba(0,0,0,0.4)",
-                borderRadius: "16px",
-                borderLeft: `6px solid ${theme.secondaryColor}`,
-                fontSize: isLandscape ? "1.8vw" : "3.5vw",
-                opacity: spring({
-                  frame: frame - explanationStartFrame,
-                  fps,
-                }),
-              }}
-            >
-              {question.explanation}
-            </div>
-          )}
         </div>
 
-        {/* Media / Timer Panel */}
+        {/* Media Panel */}
         <div style={imagePanelStyle}>
            {question.image ? (
              <Img
@@ -225,8 +284,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                  maxWidth: "100%",
                  maxHeight: "100%",
                  borderRadius: "24px",
-                 boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
-                 border: `4px solid ${theme.secondaryColor}`
+                 boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
+                 border: `1px solid rgba(255,255,255,0.1)`,
+                 opacity: enterProgress,
+                 transform: `scale(${interpolate(enterProgress, [0, 1], [0.9, 1])})`
                }}
              />
            ) : null}
@@ -234,32 +295,42 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
       </div>
 
-      {/* Countdown Timer overlay (top right) */}
-      {isCountingDown && (
-        <div
-          style={{
-            position: "absolute",
-            top: "5%",
-            right: "5%",
-            width: "12vh",
-            height: "12vh",
-            borderRadius: "50%",
-            background: "rgba(0,0,0,0.6)",
-            border: `4px solid ${theme.primaryColor}`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "6vh",
-            fontWeight: "bold",
-            color: theme.primaryColor,
-            fontFamily: theme.fontFamily,
-          }}
-        >
-          {Math.ceil(
-            (question.countdownDuration - (frame - countdownStartFrame)) / fps
-          )}
-        </div>
+      {/* Drawer-style Explanation Overlay */}
+      {isExplanation && question.explanation && (
+        <AbsoluteFill style={{ justifyContent: "flex-end", zIndex: 20 }}>
+          <div
+            style={{
+              width: "100%",
+              height: isLandscape ? "40%" : "45%",
+              background: "rgba(0,0,0,0.7)",
+              backdropFilter: "blur(30px)",
+              borderTop: `1px solid rgba(255,255,255,0.15)`,
+              borderTopLeftRadius: "32px",
+              borderTopRightRadius: "32px",
+              boxShadow: "0 -10px 40px rgba(0,0,0,0.8)",
+              padding: "5vh 8vw",
+              display: "flex",
+              flexDirection: "column",
+              gap: "2vh",
+              fontFamily: theme.fontFamily,
+              color: theme.textColor,
+              transform: `translateY(${interpolate(explanationSpring, [0, 1], [100, 0])}%)`,
+              opacity: transitionOutOpacity, // fades out smoothly with the rest of the scene transition
+            }}
+          >
+            <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: "1vh" }} />
+            <h2 style={{ fontSize: isLandscape ? "3.5vh" : "4vh", margin: 0, color: theme.secondaryColor }}>解析 Explanation</h2>
+            <div style={{
+               fontSize: isLandscape ? "2.5vh" : "3vh",
+               lineHeight: 1.6,
+               opacity: 0.9
+            }}>
+              {question.explanation}
+            </div>
+          </div>
+        </AbsoluteFill>
       )}
+
     </AbsoluteFill>
   );
 };

@@ -1,8 +1,8 @@
 {
   "meta": {
     "fps": 30,
-    "width": 1080,
-    "height": 1920
+    "width": 1920,
+    "height": 1080
   },
   "theme": {
     "primaryColor": "#3b82f6",
@@ -11,10 +11,10 @@
     "errorColor": "#ef4444",
     "textColor": "#ffffff",
     "backgroundColor": "#0f172a",
-    "fontFamily": "Outfit"
+    "fontFamily": "Outfit",
+    "bgStyle": "solid"
   },
-  "globalAudio": {
-  },
+  "globalAudio": {},
   "branding": {
     "show": true,
     "copyright": "© 2026 Mar Bro"
@@ -34,12 +34,23 @@
   },
   "questions": [
     {
-      "question": "What is the capital of France?",
+      "question": "Your blood alcohol concentration (BAC) level is .15 which is well over the limit. What is the risk of crashing if you drive?",
       "options": [
-        { "id": "A", "text": "Berlin", "isCorrect": false },
-        { "id": "B", "text": "Paris", "isCorrect": true },
-        { "id": "C", "text": "Madrid", "isCorrect": false },
-        { "id": "D", "text": "Rome", "isCorrect": false }
+        {
+          "id": "A",
+          "text": "Your risk of crashing is the same as it is for a BAC level at the legal limit.",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "Your risk of crashing is slightly higher compared to a BAC at the legal limit.",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "Your risk of crashing is greatly increased compared to a BAC at the legal limit.",
+          "isCorrect": true
+        }
       ],
       "countdownSeconds": 5,
       "answerWaitSeconds": 3,
@@ -48,9 +59,21 @@
     {
       "question": "Which planet is known as the Red Planet?",
       "options": [
-        { "id": "A", "text": "Venus", "isCorrect": false },
-        { "id": "B", "text": "Mars", "isCorrect": true },
-        { "id": "C", "text": "Jupiter", "isCorrect": false }
+        {
+          "id": "A",
+          "text": "Venus",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "Mars",
+          "isCorrect": true
+        },
+        {
+          "id": "C",
+          "text": "Jupiter",
+          "isCorrect": false
+        }
       ],
       "countdownSeconds": 5,
       "answerWaitSeconds": 3

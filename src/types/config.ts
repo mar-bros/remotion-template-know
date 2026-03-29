@@ -17,6 +17,7 @@ export const ThemeSchema = z.object({
   textColor: zColor().default("#ffffff"),
   backgroundColor: zColor().default("#0f172a"),
   fontFamily: z.string().default("Outfit"),
+  bgStyle: z.enum(["universe", "solid", "image"]).default("universe"),
 });
 
 // global audio config
@@ -73,7 +74,8 @@ export const KnowConfigSchema = z.object({
     errorColor: "#ef4444",
     textColor: "#ffffff",
     backgroundColor: "#0f172a",
-    fontFamily: "Outfit"
+    fontFamily: "Outfit",
+    bgStyle: "universe"
   }),
   globalAudio: GlobalAudioSchema.default({
     bgMusicVolume: 0.3
