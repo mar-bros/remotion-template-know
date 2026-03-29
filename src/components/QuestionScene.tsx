@@ -180,59 +180,16 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     ? question.image
     : (question.image ? staticFile(question.image) : null);
 
-  // 2. 环境图片区块 (完全拆离由于横竖屏造成的 Flex 和 Position 高度坍塌冲突)
-  const QuestionImageBlock = question.image && imageSrc ? (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flex: isLandscape ? "0 1 auto" : "none", // 横屏允许随内容自适应调整比例，且不被强制伸缩
-      width: isLandscape ? "auto" : "100%",
-      position: "relative",
-      marginTop: isLandscape ? 0 : "1vh", // 竖屏稍微留白，避免截断
-    }}>
-      {isLandscape ? (
-        /* 横屏：恢复自然原图比例约束，避免 cover 强行截断造成误导 */
-        <Img
-          src={imageSrc}
-          style={{
-            width: "auto",
-            height: "auto",
-            maxWidth: "60vw", // 遇到惊人的宽图最多占用60vw空间
-            maxHeight: "55vh", // 遇到高瘦图最多占用55vh空间，把剩余宽度释放给选项
-            objectFit: "contain", // 绝对禁止剪裁
-            borderRadius: "16px",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
-            border: `1px solid rgba(255,255,255,0.1)`,
-          }}
-        />
-      ) : (
-        /* 竖屏：标准的响应式大图块，乖乖插入到上下之间，不产生任何浮空重叠危机 */
-        <Img
-          src={imageSrc}
-          style={{
-            maxWidth: "100%",
-            maxHeight: "22vh", // 将竖屏下图片最高占用从 28vh 下压到 22vh，为恐怖长度的选项腾出巨大空间
-            objectFit: "contain",
-            borderRadius: "16px",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
-            border: `1px solid rgba(255,255,255,0.1)`,
-          }}
-        />
-      )}
-    </div>
-  ) : null;
-
   // 3. 选项列表卡片区块 (被精简大小的毛玻璃包裹层)
   const OptionsListBlock = (
-    <div style={{
+    <div style={{ 
       ...(isLandscape ? glassStyle : {}), // 根据最新反馈，竖屏模式下直接剔除外层共用背景框，使设计更轻量
-      display: "flex",
-      flexDirection: "column",
+      display: "flex", 
+      flexDirection: "column", 
       gap: "1.5vh", // 缩减选项之间的留白，解救长文本溢出局促感 
       // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
       flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
-      width: isLandscapeNoImage ? "100%" : "auto", // 除了横屏没图片强制霸占整栏，其余全部自然收缩包裹文字或者利用flex拉伸
+      width: isLandscape ? (isLandscapeNoImage ? "100%" : "auto") : "100%", // 竖屏占满父级 auto 容器
       alignSelf: isLandscapeNoImage ? "flex-start" : "center",
       maxWidth: isLandscapeNoImage ? "none" : (isLandscape ? "60vw" : "85vw") // 防长串文本溢出的安全屏障
     }}>
@@ -350,28 +307,60 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
       {/* 居中流式主场景容器 */}
       <div style={containerStyle}>
-
-        {/* 增加一个逻辑内包裹层：用于无图横屏时的绝对居中包裹 + 内部左对齐 */}
+        
+        {/* 内容骨架包裹层 */}
         <div style={{
           display: "flex",
           flexDirection: "column",
           alignItems: isLandscapeNoImage ? "flex-start" : "center",
-          width: isLandscapeNoImage ? "70vw" : "100%", // 无图片时将内容束在70vw，保证外层居中时文字和选项切齐左边缘
+          width: isLandscapeNoImage ? "70vw" : (isLandscape ? "100%" : "auto"), 
+          maxWidth: isLandscape ? "100%" : "85vw",
         }}>
           {/* 全局位于页面相对靠顶端的问题标题 */}
           {QuestionTitleBlock}
-
-          {/* 图片与选项排版区，自动识别原图宽高进行流式对称或上下叠放 */}
+          
+          {/* 图片与选项排版区 */}
           <div style={{
             display: "flex",
             flexDirection: isLandscape ? "row" : "column",
-            width: "100%",
+            width: isLandscape ? "100%" : "auto", // 竖屏下宽度由子级(选项)撑开
             gap: isLandscape ? "4vw" : "3vh",
             justifyContent: isLandscapeNoImage ? "flex-start" : "center",
-            alignItems: isLandscapeNoImage ? "flex-start" : "center", // 回退 stretch 拉伸对齐，采用 center 等待内容互博撑开
-            marginTop: isLandscapeNoImage ? "2vh" : 0, // 无图片时让大横排间距与纵排自然区隔
+            alignItems: isLandscape ? "stretch" : "center",
+            marginTop: isLandscapeNoImage ? "2vh" : 0,
           }}>
-            {QuestionImageBlock}
+            {/* 图片块 */}
+            {question.image && imageSrc && (
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flex: isLandscape ? "0 0 auto" : "none", // 横屏不强行占据 1:1，而是根据资源比例自然占据
+                width: isLandscape ? "auto" : "68%", // 竖屏下占包裹层宽度的 68%
+                position: "relative",
+              }}>
+                <div style={{
+                  width: "100%",
+                  height: isLandscape ? "100%" : "auto",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+                  border: `1px solid rgba(255,255,255,0.1)`,
+                }}>
+                  <Img
+                    src={imageSrc}
+                    style={{
+                      width: isLandscape ? "auto" : "100%",
+                      height: isLandscape ? "100%" : "auto",
+                      maxWidth: isLandscape ? "55vw" : "none",
+                      maxHeight: isLandscape ? "45vh" : "28vh",
+                      objectFit: "contain", // 解决截断问题，确保全图可见
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+            
             {OptionsListBlock}
           </div>
         </div>
