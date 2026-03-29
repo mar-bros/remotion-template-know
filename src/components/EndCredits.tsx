@@ -70,10 +70,9 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
             >
               <span
                 style={{
-                  fontSize: "3vw",
+                  fontSize: "0.8vw",
                   color: "rgba(255,255,255,0.6)",
                   fontFamily: "sans-serif",
-                  fontWeight: 400,
                   minWidth: 120,
                   textAlign: "center",
                   textTransform: "uppercase",
@@ -84,10 +83,9 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
               </span>
               <span
                 style={{
-                  fontSize: "4vw",
+                  fontSize: "1vw",
                   color: "rgba(255,255,255,0.95)",
                   fontFamily: "sans-serif",
-                  fontWeight: 600,
                   textAlign: "center",
                 }}
               >

@@ -19,7 +19,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
         bottom: 0,
         left: 0,
         right: 0,
-        height: "12%", 
+        height: "12%",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -47,7 +47,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
         ) : (
           <span
             style={{
-              fontSize: "2.5vh",
+              fontSize: "1.5vh",
               color: "rgba(255,255,255,0.5)",
               fontFamily: "sans-serif",
               letterSpacing: "0.03em"
@@ -62,7 +62,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
       {branding.copyright && (
         <span
           style={{
-            fontSize: "2.5vh",
+            fontSize: "1.5vh",
             color: "rgba(255,255,255,0.5)",
             fontFamily: "sans-serif",
             letterSpacing: "0.03em",
