@@ -182,10 +182,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
   // 3. 选项列表卡片区块 (被精简大小的毛玻璃包裹层)
   const OptionsListBlock = (
-    <div style={{ 
+    <div style={{
       ...(isLandscape ? glassStyle : {}), // 根据最新反馈，竖屏模式下直接剔除外层共用背景框，使设计更轻量
-      display: "flex", 
-      flexDirection: "column", 
+      display: "flex",
+      flexDirection: "column",
       gap: "1.5vh", // 缩减选项之间的留白，解救长文本溢出局促感 
       // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
       flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
@@ -307,18 +307,18 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
       {/* 居中流式主场景容器 */}
       <div style={containerStyle}>
-        
+
         {/* 内容骨架包裹层 */}
         <div style={{
           display: "flex",
           flexDirection: "column",
           alignItems: isLandscapeNoImage ? "flex-start" : "center",
-          width: isLandscapeNoImage ? "70vw" : (isLandscape ? "100%" : "auto"), 
+          width: isLandscapeNoImage ? "70vw" : (isLandscape ? "100%" : "auto"),
           maxWidth: isLandscape ? "100%" : "85vw",
         }}>
           {/* 全局位于页面相对靠顶端的问题标题 */}
           {QuestionTitleBlock}
-          
+
           {/* 图片与选项排版区 */}
           <div style={{
             display: "flex",
@@ -335,32 +335,40 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                flex: isLandscape ? "0 0 auto" : "none", // 横屏不强行占据 1:1，而是根据资源比例自然占据
+                flex: isLandscape ? 1 : "none",
                 width: isLandscape ? "auto" : "68%", // 竖屏下占包裹层宽度的 68%
-                position: "relative",
+                position: isLandscape ? "relative" : "relative",
+                minHeight: isLandscape ? 0 : "auto",
               }}>
-                <div style={{
-                  width: "100%",
-                  height: isLandscape ? "100%" : "auto",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
-                  border: `1px solid rgba(255,255,255,0.1)`,
-                }}>
+                {isLandscape ? (
+                  /* 横屏：填满高度但不截断，边框锁定在图片实际内容上 */
                   <Img
                     src={imageSrc}
                     style={{
-                      width: isLandscape ? "auto" : "100%",
-                      height: isLandscape ? "100%" : "auto",
-                      maxWidth: isLandscape ? "55vw" : "none",
-                      maxHeight: isLandscape ? "45vh" : "28vh",
-                      objectFit: "contain", // 解决截断问题，确保全图可见
+                      height: "100%",
+                      width: "auto", // 宽度随比例缩放，不截断也不变形
+                      objectFit: "contain",
+                      borderRadius: "16px",
+                      boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+                      border: `1px solid rgba(255,255,255,0.1)`,
                     }}
                   />
-                </div>
+                ) : (
+                  /* 竖屏：强制撑满 100% 宽度匹配选项，高度自适应杜绝变形 */
+                  <Img
+                    src={imageSrc}
+                    style={{
+                      width: "100%", 
+                      height: "auto", // 关键：高度跟随比例自适应，不产生透明框或变形
+                      borderRadius: "16px",
+                      boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+                      border: `1px solid rgba(255,255,255,0.1)`,
+                    }}
+                  />
+                )}
               </div>
             )}
-            
+
             {OptionsListBlock}
           </div>
         </div>
