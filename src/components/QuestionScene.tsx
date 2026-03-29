@@ -108,7 +108,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     fontFamily: theme.fontFamily,
     color: theme.textColor,
     zIndex: 10,
-    transform: `scale(${containerScale}) translateY(${interpolate(enterProgress, [0, 1], [40, 0])}px)`,
+    transform: `scale(${containerScale})`, // 取消初始的向上滑动动效(translateY)以免造成视觉未对齐的迟钝感
     filter: `brightness(${containerDim}) blur(${containerBlur}px)`,
     transition: "transform 0.1s linear, filter 0.1s linear",
   };
@@ -185,30 +185,26 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       display: "flex", 
       alignItems: "center", 
       justifyContent: "center",
-      flex: isLandscape ? 1 : "none", // 横屏占一半空间拉伸，竖屏则保持自然布局
-      width: "100%",
+      flex: isLandscape ? "0 1 auto" : "none", // 横屏允许随内容自适应调整比例，且不被强制伸缩
+      width: isLandscape ? "auto" : "100%",
       position: "relative",
-      marginTop: isLandscape ? 0 : "3vh", // 竖屏为了不黏着标题略微留白
+      marginTop: isLandscape ? 0 : "3vh", // 竖屏留白
     }}>
       {isLandscape ? (
-        /* 横屏：为了拉伸填满与右侧选项一致的高度，使用 absolute 完全覆盖其所在的那一半列格 */
-        <div style={{ 
-           position: "absolute",
-           top: 0, left: 0, right: 0, bottom: 0,
-           borderRadius: "16px",
-           overflow: "hidden", 
-           boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
-           border: `1px solid rgba(255,255,255,0.1)`,
-        }}>
-          <Img
-            src={imageSrc}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover", // 铺满等高盒子，不留死角
-            }}
-          />
-        </div>
+        /* 横屏：恢复自然原图比例约束，避免 cover 强行截断造成误导 */
+        <Img
+          src={imageSrc}
+          style={{
+            width: "auto",
+            height: "auto",
+            maxWidth: "60vw", // 遇到惊人的宽图最多占用60vw空间
+            maxHeight: "55vh", // 遇到高瘦图最多占用55vh空间，把剩余宽度释放给选项
+            objectFit: "contain", // 绝对禁止剪裁
+            borderRadius: "16px",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+            border: `1px solid rgba(255,255,255,0.1)`,
+          }}
+        />
       ) : (
         /* 竖屏：标准的响应式大图块，乖乖插入到上下之间，不产生任何浮空重叠危机 */
         <Img
@@ -233,8 +229,9 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       display: "flex", 
       flexDirection: "column", 
       gap: "2vh", 
-      // 使选项框"紧贴内容"而不再是拉伸占满全屏，修复竖屏左右边缘空隙过大的问题
-      width: isLandscapeNoImage ? "100%" : "auto", // 除了横屏没图片强制霸占整栏，其余全部自然收缩包裹文字
+      // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
+      flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
+      width: isLandscapeNoImage ? "100%" : "auto", // 除了横屏没图片强制霸占整栏，其余全部自然收缩包裹文字或者利用flex拉伸
       alignSelf: isLandscapeNoImage ? "flex-start" : "center",
       maxWidth: isLandscapeNoImage ? "none" : (isLandscape ? "60vw" : "85vw") // 防长串文本溢出的安全屏障
     }}>
@@ -275,12 +272,12 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               fontSize: isLandscape ? "2.6vh" : "2.8vh",
               fontWeight: 600,
               opacity: optionEnter * opacity,
-              transform: `translateY(${interpolate(optionEnter, [0, 1], [20, 0])}px)`,
               display: "flex",
               alignItems: "center",
               gap: "2vh",
               boxShadow: isRevealed && opt.isCorrect ? `0 0 30px ${theme.correctColor}55` : "none",
-              transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)", 
+              // 关键修复：CSS Transition 不能应用在所有属性上(all)，否则会与 Remotion 逐帧计算的 opacity/transform 发生打架，导致明显拖影和延迟错位。只过渡颜色和阴影！
+              transition: "background 0.3s ease, box-shadow 0.3s ease, border 0.3s ease, color 0.3s ease", 
             }}
           >
             {/* 左侧的 A/B/C 悬浮圆球设计 */}
@@ -332,14 +329,14 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           {/* 全局位于页面相对靠顶端的问题标题 */}
           {QuestionTitleBlock}
           
-          {/* 图片与选项排版区，根据横竖比例自动变形为左右对称或上下叠放 */}
+          {/* 图片与选项排版区，自动识别原图宽高进行流式对称或上下叠放 */}
           <div style={{
             display: "flex",
             flexDirection: isLandscape ? "row" : "column",
             width: "100%",
             gap: isLandscape ? "4vw" : "3vh",
             justifyContent: isLandscapeNoImage ? "flex-start" : "center",
-            alignItems: isLandscape ? "stretch" : (isLandscapeNoImage ? "flex-start" : "center"), // 横屏采用 stretch 使左右等高，图片从而自动撑满
+            alignItems: isLandscapeNoImage ? "flex-start" : "center", // 回退 stretch 拉伸对齐，采用 center 等待内容互博撑开
             marginTop: isLandscapeNoImage ? "2vh" : 0, // 无图片时让大横排间距与纵排自然区隔
           }}>
             {QuestionImageBlock}
