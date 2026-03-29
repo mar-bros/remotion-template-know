@@ -16,7 +16,7 @@
   },
   "globalAudio": {
     "bgMusic": "bgMusic-prettyjohn1-no-copyright-music-hip-hop-498106.mp3",
-    "bgMusicVolume": 0.8,
+    "bgMusicVolume": 0.3,
     "questionPopSound": "questionPopSound-dragon-studio-whoosh-cinematic-376875.mp3",
     "countdownSound": "countdownSound-kakaist-10sec-digital-countdown-sfx-319873.mp3",
     "answerRevealSound": "answerRevealSound-u_s026io00zm-beep-401570.mp3"
