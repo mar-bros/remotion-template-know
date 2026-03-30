@@ -12,6 +12,7 @@ import {
 } from "remotion";
 import type { ThemeSchema } from "../types/config";
 import { z } from "zod";
+import Markdown from "markdown-to-jsx";
 import type { ResolvedQuestion } from "../utils/timing";
 
 type ThemeConfig = z.infer<typeof ThemeSchema>;
@@ -358,7 +359,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                   <Img
                     src={imageSrc}
                     style={{
-                      width: "100%", 
+                      width: "100%",
                       height: "auto", // 关键：高度跟随比例自适应，不产生透明框或变形
                       borderRadius: "16px",
                       boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
@@ -400,7 +401,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           >
             {/* 抽屉扶手小条装饰 */}
             <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: "1vh" }} />
-            <h2 style={{ fontSize: "3vh", margin: 0, color: theme.secondaryColor }}>解析 Explanation</h2>
+            {/* <h2 style={{ fontSize: "3vh", margin: 0, color: theme.secondaryColor }}>解析 Explanation</h2> */}
             <div style={{
               fontSize: isLandscape ? "2.5vh" : "2.6vh",
               lineHeight: 1.6,
@@ -408,7 +409,32 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               overflowY: "auto",
               paddingBottom: "2vh"
             }}>
-              {question.explanation}
+              <Markdown
+                options={{
+                  overrides: {
+                    h1: { component: "h1", props: { style: { fontSize: "1.5em", margin: "1em 0 0.5em" } } },
+                    h2: { component: "h2", props: { style: { fontSize: "1.3em", margin: "1em 0 0.5em" } } },
+                    h3: { component: "h3", props: { style: { fontSize: "1.1em", margin: "1em 0 0.5em" } } },
+                    p: { component: "p", props: { style: { margin: "0.5em 0" } } },
+                    ul: { component: "ul", props: { style: { paddingLeft: "1.5em", margin: "0.5em 0" } } },
+                    ol: { component: "ol", props: { style: { paddingLeft: "1.5em", margin: "0.5em 0" } } },
+                    li: { component: "li", props: { style: { margin: "0.3em 0" } } },
+                    code: {
+                      component: "code",
+                      props: {
+                        style: {
+                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          padding: "0.2em 0.4em",
+                          borderRadius: "4px",
+                          fontFamily: "monospace",
+                        },
+                      },
+                    },
+                  },
+                }}
+              >
+                {question.explanation}
+              </Markdown>
             </div>
           </div>
         </AbsoluteFill>

@@ -11,6 +11,7 @@
     "@remotion/media": "^4.0.441",
     "@remotion/media-utils": "^4.0.441",
     "@remotion/tailwind-v4": "4.0.441",
+    "markdown-to-jsx": "^9.7.13",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.441",
