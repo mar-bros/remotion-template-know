@@ -3,6 +3,8 @@ import React from "react";
 import { getInputProps, Composition, staticFile } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { KnowConfigSchema, type KnowConfig } from "./types/config";
+import { loadFont as loadLexend } from "@remotion/google-fonts/Lexend";
+import { loadFont as loadNotoSansSC } from "@remotion/google-fonts/NotoSansSC";
 import { buildTimeline, getTotalFrames } from "./utils/timing";
 import { KnowVideo } from "./compositions/KnowVideo";
 import exampleData from "./data/example.json";
@@ -88,8 +90,14 @@ const defaultProps: KnowVideoProps = {
   audioDurations: {},
   resolvedTimeline: [],
 };
-
-
+// Load fonts at the top level
+loadLexend("normal", {
+  weights: ["400", "600", "700", "800", "900"],
+});
+loadNotoSansSC("normal", {
+  weights: ["400", "700"],
+  ignoreTooManyRequestsWarning: true,
+});
 
 export const RemotionRoot: React.FC = () => {
   return (

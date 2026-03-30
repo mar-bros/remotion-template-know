@@ -42,8 +42,8 @@ export const ThemeSchema = z.object({
   textColor: zColor().default("#ffffff"),
   /** 全局底色，用于纯色背景或极光背景的最底层基础色 */
   backgroundColor: zColor().default("#0f172a"),
-  /** 字体类型，默认使用系统字体栈，可填入任何在 Remotion 环境或 Web 安全支持的字体名 */
-  fontFamily: z.string().default("inherit"),
+  /** 字体类型，默认使用 Outfit，可填入任何在 Remotion 环境或 Web 安全支持的字体名 */
+  fontFamily: z.string().default("Lexend"),
   /** 视频背景风格："universe" (现代极光流体深空特效), "solid" (纯色), "image" (使用自定义全局图片) */
   bgStyle: z.enum(["universe", "solid", "image"]).default("universe"),
 });
@@ -134,7 +134,7 @@ export const KnowConfigSchema = z.object({
     errorColor: "#ef4444",
     textColor: "#ffffff",
     backgroundColor: "#0f172a",
-    fontFamily: "inherit",
+    fontFamily: "Lexend",
     bgStyle: "universe"
   }),
   globalAudio: GlobalAudioSchema.default({
