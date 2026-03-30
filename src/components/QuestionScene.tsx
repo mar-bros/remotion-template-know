@@ -107,7 +107,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     justifyContent: "center",
     gap: isLandscape ? "4vh" : "3vh", // 给标题区块和下方内容提供呼吸感
     opacity: transitionOutOpacity * enterProgress,
-    fontFamily: theme.fontFamily,
+    fontFamily: `${theme.fontFamily}, "Noto Sans SC", sans-serif`,
     color: theme.textColor,
     zIndex: 10,
     transform: `scale(${containerScale})`, // 取消初始的向上滑动动效(translateY)以免造成视觉未对齐的迟钝感
@@ -381,19 +381,20 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           <div
             style={{
               width: "100%",
-              height: isLandscape ? "45%" : "40%", // 大屏或小屏时控制解析区的高度占用
-              background: "rgba(0,0,0,0.6)",
-              backdropFilter: "blur(40px)",
-              WebkitBackdropFilter: "blur(40px)",
-              borderTop: `1px solid rgba(255,255,255,0.15)`,
-              borderTopLeftRadius: "32px",
-              borderTopRightRadius: "32px",
-              boxShadow: "0 -10px 40px rgba(0,0,0,0.8)",
-              padding: "5vh 8vw",
+              height: "auto", // 根据内容动态控制高度
+              minHeight: isLandscape ? "35%" : "30%", // 保持最低美感高度
+              background: "rgba(0,0,0,0.7)", // 稍微加深背景以提升高级感
+              backdropFilter: "blur(50px)",
+              WebkitBackdropFilter: "blur(50px)",
+              borderTop: `1px solid rgba(255,255,255,0.2)`,
+              borderTopLeftRadius: "40px",
+              borderTopRightRadius: "40px",
+              boxShadow: "0 -20px 60px rgba(0,0,0,0.9)",
+              padding: isLandscape ? "4vh 8vw" : "4vh 6vw",
               display: "flex",
               flexDirection: "column",
               gap: "2vh",
-              fontFamily: theme.fontFamily,
+              fontFamily: `${theme.fontFamily}, "Noto Sans SC", sans-serif`,
               color: theme.textColor,
               transform: `translateY(${interpolate(explanationSpring, [0, 1], [100, 0])}%)`,
               opacity: transitionOutOpacity,
@@ -403,30 +404,33 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
             <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: "1vh" }} />
             {/* <h2 style={{ fontSize: "3vh", margin: 0, color: theme.secondaryColor }}>解析 Explanation</h2> */}
             <div style={{
-              fontSize: isLandscape ? "2.5vh" : "2.6vh",
-              lineHeight: 1.6,
-              opacity: 0.9,
-              overflowY: "auto",
-              paddingBottom: "2vh"
+              fontSize: isLandscape ? "2.4vh" : "2.4vh", // 略微缩小字号提升精致感
+              lineHeight: 1.7, // 增加行高，中英文混排更舒展
+              opacity: 0.95,
+              overflowY: "visible", // 去掉滑块，内容自动撑开
+              paddingBottom: "4vh" // 底部留白防挤压
             }}>
               <Markdown
                 options={{
                   overrides: {
-                    h1: { component: "h1", props: { style: { fontSize: "1.5em", margin: "1em 0 0.5em" } } },
-                    h2: { component: "h2", props: { style: { fontSize: "1.3em", margin: "1em 0 0.5em" } } },
-                    h3: { component: "h3", props: { style: { fontSize: "1.1em", margin: "1em 0 0.5em" } } },
-                    p: { component: "p", props: { style: { margin: "0.5em 0" } } },
-                    ul: { component: "ul", props: { style: { paddingLeft: "1.5em", margin: "0.5em 0" } } },
-                    ol: { component: "ol", props: { style: { paddingLeft: "1.5em", margin: "0.5em 0" } } },
-                    li: { component: "li", props: { style: { margin: "0.3em 0" } } },
+                    h1: { component: "h1", props: { style: { fontSize: "1.4em", fontWeight: 800, margin: "1.2em 0 0.6em", color: theme.secondaryColor } } },
+                    h2: { component: "h2", props: { style: { fontSize: "1.25em", fontWeight: 700, margin: "1.1em 0 0.5em", color: theme.secondaryColor } } },
+                    h3: { component: "h3", props: { style: { fontSize: "1.15em", fontWeight: 700, margin: "1em 0 0.4em" } } },
+                    p: { component: "p", props: { style: { margin: "0.8em 0" } } },
+                    ul: { component: "ul", props: { style: { paddingLeft: "1.2em", margin: "0.6em 0" } } },
+                    ol: { component: "ol", props: { style: { paddingLeft: "1.2em", margin: "0.6em 0" } } },
+                    li: { component: "li", props: { style: { margin: "0.4em 0" } } },
+                    hr: { component: "hr", props: { style: { border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "1.5em 0" } } },
+                    strong: { component: "strong", props: { style: { fontWeight: 800, color: theme.primaryColor } } },
                     code: {
                       component: "code",
                       props: {
                         style: {
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          backgroundColor: "rgba(255, 255, 255, 0.15)",
                           padding: "0.2em 0.4em",
-                          borderRadius: "4px",
-                          fontFamily: "monospace",
+                          borderRadius: "6px",
+                          fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+                          fontSize: "0.9em",
                         },
                       },
                     },
