@@ -23,7 +23,7 @@ export const buildTimeline = (
     // 1. Enter state (Question & Options appear)
     // If there's a voice for the question, use its duration, otherwise default 30 frames
     let enterFrames = Math.max(30, Math.floor((q.voice ? (audioDurations[q.voice] || 1) : 0) * fps));
-    
+
     // Minimum 1 second for reading if no voice
     if (!q.voice) {
       enterFrames = fps * 1.5;
@@ -40,10 +40,9 @@ export const buildTimeline = (
 
     // 4. Explanation duration
     let explanationFrames = 0;
-    if (q.explanationVoice) {
-      explanationFrames = Math.floor((audioDurations[q.explanationVoice] || 2) * fps);
-    } else if (q.explanation) {
-      explanationFrames = fps * 3; // 3 seconds to read text manually
+    if (q.explanation) {
+      // 已经人工指定时长 (default 10s)，不再根据音频动态计算
+      explanationFrames = Math.floor(q.explanationSeconds * fps);
     }
 
     const durationInFrames = enterFrames + countdownFrames + revealFrames + explanationFrames;
@@ -74,10 +73,10 @@ export const getTotalFrames = (
   fps: number
 ): number => {
   if (resolvedQuestions.length === 0) return 30; // Min 1 sec fallback
-  
+
   const lastQuestion = resolvedQuestions[resolvedQuestions.length - 1];
   const creditsFrames = Math.floor(endCreditsSeconds * fps);
-  
+
   // Total frames = end of last question + whatever credits we need
   return lastQuestion.startFrame + lastQuestion.durationInFrames + creditsFrames;
 };

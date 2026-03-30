@@ -118,6 +118,8 @@ export const QuestionSchema = z.object({
   answerWaitSeconds: z.number().min(0).default(3),
   /** (可选) 答案解析长文本文本。如果配置了，将在 answerWaitSeconds 结束后触动底部的毛玻璃“抽屉”滑动展示 */
   explanation: z.string().optional(),
+  /** (可选) 答案解析展示时长 (秒)。若配置了解析，必须人工设定时长（默认 10 秒），不再根据音频时长动态计算 */
+  explanationSeconds: z.number().min(0).default(10),
   /** (可选) 答案解析展示时，需要播放的详细语音解析文件的路径 */
   explanationVoice: z.string().optional(),
 });
