@@ -107,7 +107,6 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     justifyContent: "center",
     gap: isLandscape ? "4vh" : "3vh", // 给标题区块和下方内容提供呼吸感
     opacity: transitionOutOpacity * enterProgress,
-    fontFamily: `${theme.fontFamily}, "Noto Sans SC", sans-serif`,
     color: theme.textColor,
     zIndex: 10,
     transform: `scale(${containerScale})`, // 取消初始的向上滑动动效(translateY)以免造成视觉未对齐的迟钝感
@@ -152,7 +151,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
             <circle cx={timerRadius * 1.1} cy={timerRadius * 1.1} r={timerRadius} stroke={theme.primaryColor} strokeWidth="6" fill="none"
               strokeDasharray={timerCircumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" />
           </svg>
-          <span style={{ fontSize: "3vh", fontWeight: "bold", fontFamily: theme.fontFamily }}>
+          <span style={{ fontSize: "3vh", fontWeight: "bold" }}>
             {isRevealed ? "0" : Math.max(0, Math.ceil((question.countdownDuration - (frame - countdownStartFrame)) / fps))}
           </span>
         </div>
@@ -394,7 +393,6 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               display: "flex",
               flexDirection: "column",
               gap: "2vh",
-              fontFamily: `${theme.fontFamily}, "Noto Sans SC", sans-serif`,
               color: theme.textColor,
               transform: `translateY(${interpolate(explanationSpring, [0, 1], [100, 0])}%)`,
               opacity: transitionOutOpacity,

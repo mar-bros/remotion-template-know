@@ -62,7 +62,7 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: 16,
+                gap: 8,
                 opacity: itemOpacity,
                 transform: `translateY(${itemY}px)`,
                 marginTop: "26px",
