@@ -124,7 +124,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
         {/* 描述性文本列表 (交错浮现) */}
         <div
           style={{
-            marginTop: s(120),
+            margin: s(180),
             display: "flex",
             flexDirection: "column",
             gap: s(40),
@@ -140,6 +140,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
               <div
                 key={i}
                 style={{
+                  lineHeight: vv(0.1),
                   fontSize: vv(1.6),
                   opacity: lineSpring,
                   fontWeight: 400,
