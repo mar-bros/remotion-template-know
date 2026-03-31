@@ -6,6 +6,7 @@ import { KnowConfigSchema, type KnowConfig } from "./types/config";
 import { loadFont as loadLexend } from "@remotion/google-fonts/Lexend";
 import { loadFont as loadNotoSansSC } from "@remotion/google-fonts/NotoSansSC";
 import { buildTimeline, getTotalFrames } from "./utils/timing";
+import { deepMerge } from "./utils/merge";
 import { KnowVideo } from "./compositions/KnowVideo";
 import exampleData from "./data/example.json";
 
@@ -17,9 +18,12 @@ export type KnowVideoProps = KnowConfig & {
 const calculateMetadata: CalculateMetadataFunction<KnowVideoProps> = async ({
   props,
 }) => {
-  // Read props override via --props OR default props
+  // 手动深度合并 CLI 传入的参数 (getInputProps) 到默认的 exampleData 上，
+  // 避免 Remotion 默认的浅拷贝导致嵌套对象（如 globalAudio）里的其他默认值丢失。
   const inputProps = getInputProps();
-  const config = KnowConfigSchema.parse({ ...props, ...inputProps });
+  const mergedConfig = deepMerge(exampleData, inputProps);
+  const config = KnowConfigSchema.parse(mergedConfig);
+  console.info("config >>> ", JSON.stringify(config, null, 2))
 
   // 辅助解析音频路径
   const resolveAudio = (src?: string) => {
