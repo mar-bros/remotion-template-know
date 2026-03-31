@@ -337,7 +337,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                 justifyContent: "center",
                 flex: "none",
                 width: isLandscape ? "auto" : "100%",
-                height: isLandscape ? s(650) : vh(25), // 统一设定固定高度值，避免异形图片撑爆布局
+                height: isLandscape ? "auto" : vh(25), // 横屏下自动拉伸以匹配右侧选项高度，竖屏保持固定比例
                 position: "relative",
               }}>
                 <Img
