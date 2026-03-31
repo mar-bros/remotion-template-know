@@ -27,7 +27,7 @@ interface IntroSceneProps {
  */
 export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
   const frame = useCurrentFrame();
-  const { s, isLandscape } = useScale();
+  const { s, vv } = useScale();
   const { fps } = useVideoConfig(); // Need fps for duration math
 
   // 1. 处理背景素材路径
@@ -88,14 +88,14 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          padding: isLandscape ? `0 ${s(180)}px` : `0 ${s(140)}px`,
+          padding: `0 ${vv(2)}px`,
           textAlign: "center",
         }}
       >
         {config.title && (
           <h1
             style={{
-              fontSize: isLandscape ? s(170) : s(135),
+              fontSize: vv(4.4),
               fontWeight: 900,
               margin: 0,
               letterSpacing: "-0.02em",
@@ -112,7 +112,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
           <div
             style={{
               marginTop: s(60),
-              fontSize: isLandscape ? s(77) : s(67),
+              fontSize: vv(2),
               fontWeight: 600,
               opacity: subtitleProgress,
             }}
@@ -140,7 +140,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
               <div
                 key={i}
                 style={{
-                  fontSize: isLandscape ? s(54) : s(46),
+                  fontSize: vv(1.6),
                   opacity: lineSpring,
                   fontWeight: 400,
                   transform: `translateY(${interpolate(

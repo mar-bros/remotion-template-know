@@ -12,7 +12,7 @@ interface EndCreditsProps {
 
 export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) => {
   const frame = useCurrentFrame();
-  const { s } = useScale();
+  const { s, vv } = useScale();
 
   const localFrame = frame - startFrame;
   if (localFrame < 0) return null;
@@ -71,7 +71,7 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
             >
               <span
                 style={{
-                  fontSize: s(56),
+                  fontSize: vv(1.2),
                   color: "rgba(255,255,255,0.6)",
                   fontFamily: "sans-serif",
                   minWidth: 120,
@@ -84,7 +84,7 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
               </span>
               <span
                 style={{
-                  fontSize: s(78),
+                  fontSize: vv(1.8),
                   color: "rgba(255,255,255,0.95)",
                   fontFamily: "sans-serif",
                   textAlign: "center",

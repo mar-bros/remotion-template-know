@@ -25,8 +25,25 @@ export const useScale = () => {
 		return (v / BASE) * height * multiplier;
 	};
 
+	/**
+	 * 基于视频宽度的绝对比例 (替代有渲染兼容性问题的 vw)
+	 * @param percentage 0-100 的数值
+	 */
+	const vw = (percentage: number) => (width * percentage) / 100;
+
+	/**
+	 * 基于视频高度的绝对比例 (替代有渲染兼容性问题的 vh)
+	 * @param percentage 0-100 的数值
+	 */
+	const vh = (percentage: number) => (height * percentage) / 100;
+
+	const vv = (percentage: number) => isLandscape ? vw(percentage) : vh(percentage);
+
 	return {
 		s,
+		vw,
+		vh,
+		vv,
 		isLandscape,
 		isPortrait,
 		width,

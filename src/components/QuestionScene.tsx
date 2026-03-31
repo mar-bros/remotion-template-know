@@ -39,7 +39,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   globalAudio,
 }) => {
   const frame = useCurrentFrame();
-  const { s, isLandscape } = useScale();
+  const { s, vw, vv, isLandscape } = useScale();
   const { fps } = useVideoConfig();
 
   // -- 执行时间轴计算阶段 (Timeline Phases) --
@@ -160,8 +160,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       {/* 题目正文 (动态尺寸防爆屏) */}
       <h1
         style={{
-          fontSize: isLandscape ? s(88) : s(88), // 适当缩减竖屏标题字号，为超长题库让出安全区
-          fontWeight: 800,
+          fontSize: vv(2.6), // 适当缩减竖屏标题字号，为超长题库让出安全区
+          fontWeight: 600,
           lineHeight: 1.4,
           textShadow: "0 4px 12px rgba(0,0,0,0.6)",
           margin: 0,
@@ -188,10 +188,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       flexDirection: "column",
       gap: s(30), // 缩减选项之间的留白，解救长文本溢出局促感 
       // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
-      flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
-      width: isLandscape ? (isLandscapeNoImage ? "100%" : "auto") : "100%", // 竖屏占满父级 auto 容器
+      flex: isLandscape && question.image ? "1 1 auto" : "none", // 恢复弹性伸缩，吃满剩余空间！
+      width: isLandscape ? (isLandscapeNoImage ? "100%" : "auto") : "100%", // 恢复百分比自适应宽高
       alignSelf: isLandscapeNoImage ? "flex-start" : "center",
-      maxWidth: isLandscapeNoImage ? "none" : (isLandscape ? s(1150) : s(1630)) // 防长串文本溢出的安全屏障
+      maxWidth: isLandscapeNoImage ? "none" : (isLandscape ? vw(60) : vw(85)) // 恢复基于宽度的屏障，使用强类型 vw()
     }}>
       {question.options.map((opt, i) => {
         // 让选项交错浮现缓冲 (Staggered Animation)
@@ -228,8 +228,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               borderRadius: "16px",
               background: bgColor,
               border: outline,
-              fontSize: isLandscape ? s(66) : s(66), // 统一竖屏字体
-              fontWeight: 600,
+              fontSize: vv(2), // 统一竖屏字体
+              fontWeight: 400,
               opacity: optionEnter * opacity,
               display: "flex",
               alignItems: "center",
@@ -313,8 +313,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           display: "flex",
           flexDirection: "column",
           alignItems: isLandscapeNoImage ? "flex-start" : "center",
-          width: isLandscapeNoImage ? s(1300) : (isLandscape ? "100%" : "auto"),
-          maxWidth: isLandscape ? "100%" : s(1550),
+          width: isLandscapeNoImage ? vw(70) : (isLandscape ? "100%" : "auto"), // 恢复原始的横跨比例 vw()
+          maxWidth: isLandscape ? "100%" : vw(85),
         }}>
           {/* 全局位于页面相对靠顶端的问题标题 */}
           {QuestionTitleBlock}
@@ -323,10 +323,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           <div style={{
             display: "flex",
             flexDirection: isLandscape ? "row" : "column",
-            width: isLandscape ? "100%" : "auto", // 竖屏下宽度由子级(选项)撑开
+            width: isLandscape ? "100%" : "auto", // 必须恢复100%，让 flex:1 的选项占满右侧空间
             gap: isLandscape ? s(80) : s(60),
             justifyContent: isLandscapeNoImage ? "flex-start" : "center",
-            alignItems: isLandscape ? "stretch" : "center",
+            alignItems: isLandscape ? "stretch" : "center", // 回归上下拉伸，让图片自适应选项高度
             marginTop: isLandscapeNoImage ? s(40) : 0,
           }}>
             {/* 图片块 */}
@@ -335,8 +335,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                flex: isLandscape ? 1 : "none",
-                width: isLandscape ? "auto" : "68%", // 竖屏下占包裹层宽度的 68%
+                flex: "none", // 仍然保持 none 不变！这是消灭两边各占50%虚空的核心解法！
+                width: isLandscape ? "auto" : "68%", // 横向仅占用内容所需宽度
                 position: isLandscape ? "relative" : "relative",
                 minHeight: isLandscape ? 0 : "auto",
               }}>
@@ -402,7 +402,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
             {/* 抽屉扶手小条装饰 */}
             <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: s(20) }} />
             <div style={{
-              fontSize: isLandscape ? s(66) : s(66), // 略微缩小字号提升精致感
+              fontSize: isLandscape ? s(45) : s(66),
               lineHeight: 1.7, // 增加行高，中英文混排更舒展
               opacity: 0.95,
               overflowY: "visible", // 去掉滑块，内容自动撑开
