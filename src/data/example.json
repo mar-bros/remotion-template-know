@@ -1,8 +1,10 @@
 {
   "meta": {
     "fps": 30,
-    "width": 1920,
-    "height": 1080
+    "width1": 1920,
+    "height1": 1080,
+    "width": 1080,
+    "height": 1920
   },
   "intro": {
     "show": true,

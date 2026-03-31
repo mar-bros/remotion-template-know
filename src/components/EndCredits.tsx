@@ -1,5 +1,5 @@
-import React from "react";
 import { useCurrentFrame, interpolate } from "remotion";
+import { useScale } from "../hooks/useScale";
 import type { EndCreditsSchema } from "../types/config";
 import { z } from "zod";
 
@@ -12,6 +12,7 @@ interface EndCreditsProps {
 
 export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) => {
   const frame = useCurrentFrame();
+  const { s } = useScale();
 
   const localFrame = frame - startFrame;
   if (localFrame < 0) return null;
@@ -38,7 +39,7 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 24,
+          gap: s(40),
         }}
       >
         {config.items.map((item, i) => {
@@ -62,15 +63,15 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: 8,
+                gap: s(15),
                 opacity: itemOpacity,
                 transform: `translateY(${itemY}px)`,
-                marginTop: "26px",
+                marginTop: s(66),
               }}
             >
               <span
                 style={{
-                  fontSize: "0.8vw",
+                  fontSize: s(56),
                   color: "rgba(255,255,255,0.6)",
                   fontFamily: "sans-serif",
                   minWidth: 120,
@@ -83,7 +84,7 @@ export const EndCredits: React.FC<EndCreditsProps> = ({ config, startFrame }) =>
               </span>
               <span
                 style={{
-                  fontSize: "1vw",
+                  fontSize: s(78),
                   color: "rgba(255,255,255,0.95)",
                   fontFamily: "sans-serif",
                   textAlign: "center",

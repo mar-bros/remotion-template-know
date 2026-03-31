@@ -1,5 +1,5 @@
-import React from "react";
 import { Img, staticFile } from "remotion";
+import { useScale } from "../hooks/useScale";
 import type { BrandingSchema } from "../types/config";
 import { z } from "zod";
 
@@ -10,6 +10,7 @@ interface BottomBarProps {
 }
 
 export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
+  const { s } = useScale();
   if (!branding.show) return null;
 
   return (
@@ -19,24 +20,24 @@ export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
         bottom: 0,
         left: 0,
         right: 0,
-        height: "12%",
+        height: s(230),
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 4%",
+        padding: `0 ${s(80)}px`,
         background:
           "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.0) 100%)",
         zIndex: 50,
       }}
     >
       {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: "1vw" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: s(20) }}>
         {branding.logo ? (
           <Img
             src={staticFile(branding.logo)}
             style={{
-              height: "8vh",
-              width: "8vh",
+              height: s(150),
+              width: s(150),
               objectFit: "cover",
               borderRadius: "20%",
               boxShadow: "0 8px 32px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.2)",
@@ -47,7 +48,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
         ) : (
           <span
             style={{
-              fontSize: "1.5vh",
+            fontSize: s(29),
               color: "rgba(255,255,255,0.5)",
               fontFamily: "sans-serif",
               letterSpacing: "0.03em"
@@ -62,7 +63,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ branding }) => {
       {branding.copyright && (
         <span
           style={{
-            fontSize: "1.5vh",
+            fontSize: s(29),
             color: "rgba(255,255,255,0.5)",
             fontFamily: "sans-serif",
             letterSpacing: "0.03em",

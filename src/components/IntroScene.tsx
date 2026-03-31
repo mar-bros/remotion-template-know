@@ -9,6 +9,7 @@ import {
   Video,
   staticFile,
 } from "remotion";
+import { useScale } from "../hooks/useScale";
 import type { IntroSchema, ThemeSchema } from "../types/config";
 import { z } from "zod";
 
@@ -26,8 +27,8 @@ interface IntroSceneProps {
  */
 export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
-  const isLandscape = width > height;
+  const { s, isLandscape } = useScale();
+  const { fps } = useVideoConfig(); // Need fps for duration math
 
   // 1. 处理背景素材路径
   const bgAsset =
@@ -87,14 +88,14 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          padding: "0 10vw",
+          padding: isLandscape ? `0 ${s(180)}px` : `0 ${s(140)}px`,
           textAlign: "center",
         }}
       >
         {config.title && (
           <h1
             style={{
-              fontSize: isLandscape ? "9vh" : "7vh",
+              fontSize: isLandscape ? s(170) : s(135),
               fontWeight: 900,
               margin: 0,
               letterSpacing: "-0.02em",
@@ -110,8 +111,8 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
         {config.subtitle && (
           <div
             style={{
-              marginTop: "3vh",
-              fontSize: isLandscape ? "4vh" : "3.5vh",
+              marginTop: s(60),
+              fontSize: isLandscape ? s(77) : s(67),
               fontWeight: 600,
               opacity: subtitleProgress,
             }}
@@ -123,10 +124,10 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
         {/* 描述性文本列表 (交错浮现) */}
         <div
           style={{
-            marginTop: "6vh",
+            marginTop: s(120),
             display: "flex",
             flexDirection: "column",
-            gap: "2vh",
+            gap: s(40),
           }}
         >
           {config.description?.map((line, i) => {
@@ -139,7 +140,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
               <div
                 key={i}
                 style={{
-                  fontSize: isLandscape ? "2.8vh" : "2.4vh",
+                  fontSize: isLandscape ? s(54) : s(46),
                   opacity: lineSpring,
                   fontWeight: 400,
                   transform: `translateY(${interpolate(

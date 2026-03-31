@@ -14,6 +14,7 @@ import type { ThemeSchema } from "../types/config";
 import { z } from "zod";
 import Markdown from "markdown-to-jsx";
 import type { ResolvedQuestion } from "../utils/timing";
+import { useScale } from "../hooks/useScale";
 
 type ThemeConfig = z.infer<typeof ThemeSchema>;
 
@@ -38,10 +39,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   globalAudio,
 }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
-
-  // 判断是否为横屏比例 (Landscape: width > height)
-  const isLandscape = width > height;
+  const { s, isLandscape } = useScale();
+  const { fps } = useVideoConfig();
 
   // -- 执行时间轴计算阶段 (Timeline Phases) --
   // Enter 阶段: 题目登场、选项进入
@@ -101,11 +100,11 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     flexDirection: "column",
     width: "100%",
     height: "100%",
-    padding: isLandscape ? "5% 8%" : "8% 6%", // 控制主页面和边缘的安全边界
+    padding: isLandscape ? `${s(100)}px ${s(150)}px` : `${s(150)}px ${s(115)}px`, // 控制主页面和边缘的安全边界
     boxSizing: "border-box",
     alignItems: "center", // 重置为整体居中
     justifyContent: "center",
-    gap: isLandscape ? "4vh" : "3vh", // 给标题区块和下方内容提供呼吸感
+    gap: isLandscape ? s(80) : s(60), // 给标题区块和下方内容提供呼吸感
     opacity: transitionOutOpacity * enterProgress,
     fontFamily: `${theme.fontFamily}, "Noto Sans SC", sans-serif`,
     color: theme.textColor,
@@ -123,7 +122,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     border: "1px solid rgba(255, 255, 255, 0.1)",
     boxShadow: "0 12px 40px rgba(0, 0, 0, 0.4)",
     borderRadius: "24px",
-    padding: isLandscape ? "3vh 2.5vw" : "3.5vh 5vw", // 微调了竖屏的上下内边距，使其视觉更加均匀
+    padding: isLandscape ? `${s(60)}px ${s(50)}px` : `${s(65)}px ${s(95)}px`, // 微调了竖屏的上下内边距，使其视觉更加均匀
   };
 
   // SVG 环形进度倒计时计算
@@ -143,7 +142,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
   // 1. 顶部标题区块 (SVG倒计时球 + 大字号题目文本)
   const QuestionTitleBlock = (
-    <div style={{ display: "flex", alignItems: isLandscapeNoImage ? "center" : "center", gap: "2vh", flexDirection: isLandscape ? "row" : "column", width: "100%", marginBottom: isLandscape ? "4vh" : "2vh" }}>
+    <div style={{ display: "flex", alignItems: isLandscapeNoImage ? "center" : "center", gap: s(40), flexDirection: isLandscape ? "row" : "column", width: "100%", marginBottom: isLandscape ? s(80) : s(40) }}>
       {/* 倒计时 */}
       {question.countdownSeconds > 0 && (
         <div style={{ position: "relative", width: timerRadius * 2.2, height: timerRadius * 2.2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -152,7 +151,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
             <circle cx={timerRadius * 1.1} cy={timerRadius * 1.1} r={timerRadius} stroke={theme.primaryColor} strokeWidth="6" fill="none"
               strokeDasharray={timerCircumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" />
           </svg>
-          <span style={{ fontSize: "3vh", fontWeight: "bold", fontFamily: theme.fontFamily }}>
+          <span style={{ fontSize: s(88), fontWeight: "bold", fontFamily: theme.fontFamily }}>
             {isRevealed ? "0" : Math.max(0, Math.ceil((question.countdownDuration - (frame - countdownStartFrame)) / fps))}
           </span>
         </div>
@@ -161,7 +160,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       {/* 题目正文 (动态尺寸防爆屏) */}
       <h1
         style={{
-          fontSize: isLandscape ? "4.5vh" : "3.6vh", // 适当缩减竖屏标题字号，为超长题库让出安全区
+          fontSize: isLandscape ? s(88) : s(88), // 适当缩减竖屏标题字号，为超长题库让出安全区
           fontWeight: 800,
           lineHeight: 1.4,
           textShadow: "0 4px 12px rgba(0,0,0,0.6)",
@@ -187,12 +186,12 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       ...(isLandscape ? glassStyle : {}), // 根据最新反馈，竖屏模式下直接剔除外层共用背景框，使设计更轻量
       display: "flex",
       flexDirection: "column",
-      gap: "1.5vh", // 缩减选项之间的留白，解救长文本溢出局促感 
+      gap: s(30), // 缩减选项之间的留白，解救长文本溢出局促感 
       // 使选项框"紧贴内容"，竖屏修复左右边缘空隙过大的问题
       flex: isLandscape && question.image ? "1 1 auto" : "none", // 横屏有图时占用图片剩下的剩余空间
       width: isLandscape ? (isLandscapeNoImage ? "100%" : "auto") : "100%", // 竖屏占满父级 auto 容器
       alignSelf: isLandscapeNoImage ? "flex-start" : "center",
-      maxWidth: isLandscapeNoImage ? "none" : (isLandscape ? "60vw" : "85vw") // 防长串文本溢出的安全屏障
+      maxWidth: isLandscapeNoImage ? "none" : (isLandscape ? s(1150) : s(1630)) // 防长串文本溢出的安全屏障
     }}>
       {question.options.map((opt, i) => {
         // 让选项交错浮现缓冲 (Staggered Animation)
@@ -225,24 +224,24 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           <div
             key={opt.id}
             style={{
-              padding: isLandscape ? "1.8vh 2vw" : "2vh 3vw", // 再次极限瘦身竖屏的上下内边距，防截断
+              padding: isLandscape ? `${s(35)}px ${s(40)}px` : `${s(40)}px ${s(60)}px`, // 再次极限瘦身竖屏的上下内边距，防截断
               borderRadius: "16px",
               background: bgColor,
               border: outline,
-              fontSize: isLandscape ? "2.6vh" : "2.6vh", // 统一竖屏字体
+              fontSize: isLandscape ? s(66) : s(66), // 统一竖屏字体
               fontWeight: 600,
               opacity: optionEnter * opacity,
               display: "flex",
               alignItems: "center",
-              gap: "2vh",
+              gap: s(40),
               boxShadow: isRevealed && opt.isCorrect ? `0 0 30px ${theme.correctColor}55` : "none",
               // 绝对禁止在这里写 transition! Remotion 的非实时性会导致 transition 失帧引起选项肉眼可见的鬼畜抖动！
             }}
           >
             {/* 左侧的 A/B/C 悬浮圆球设计 */}
             <div style={{
-              minWidth: "5.5vh",
-              height: "5.5vh",
+              minWidth: s(105),
+              height: s(105),
               borderRadius: "50%",
               background: badgeBg,
               display: "flex",
@@ -314,8 +313,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           display: "flex",
           flexDirection: "column",
           alignItems: isLandscapeNoImage ? "flex-start" : "center",
-          width: isLandscapeNoImage ? "70vw" : (isLandscape ? "100%" : "auto"),
-          maxWidth: isLandscape ? "100%" : "85vw",
+          width: isLandscapeNoImage ? s(1300) : (isLandscape ? "100%" : "auto"),
+          maxWidth: isLandscape ? "100%" : s(1550),
         }}>
           {/* 全局位于页面相对靠顶端的问题标题 */}
           {QuestionTitleBlock}
@@ -325,10 +324,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
             display: "flex",
             flexDirection: isLandscape ? "row" : "column",
             width: isLandscape ? "100%" : "auto", // 竖屏下宽度由子级(选项)撑开
-            gap: isLandscape ? "4vw" : "3vh",
+            gap: isLandscape ? s(80) : s(60),
             justifyContent: isLandscapeNoImage ? "flex-start" : "center",
             alignItems: isLandscape ? "stretch" : "center",
-            marginTop: isLandscapeNoImage ? "2vh" : 0,
+            marginTop: isLandscapeNoImage ? s(40) : 0,
           }}>
             {/* 图片块 */}
             {question.image && imageSrc && (
@@ -390,10 +389,10 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               borderTopLeftRadius: "40px",
               borderTopRightRadius: "40px",
               boxShadow: "0 -20px 60px rgba(0,0,0,0.9)",
-              padding: isLandscape ? "4vh 8vw" : "4vh 6vw",
+              padding: isLandscape ? `${s(80)}px ${s(150)}px` : `${s(80)}px ${s(115)}px`,
               display: "flex",
               flexDirection: "column",
-              gap: "2vh",
+              gap: s(40),
               fontFamily: `${theme.fontFamily}, "Noto Sans SC", sans-serif`,
               color: theme.textColor,
               transform: `translateY(${interpolate(explanationSpring, [0, 1], [100, 0])}%)`,
@@ -401,14 +400,13 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
             }}
           >
             {/* 抽屉扶手小条装饰 */}
-            <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: "1vh" }} />
-            {/* <h2 style={{ fontSize: "3vh", margin: 0, color: theme.secondaryColor }}>解析 Explanation</h2> */}
+            <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: s(20) }} />
             <div style={{
-              fontSize: isLandscape ? "2.4vh" : "2.4vh", // 略微缩小字号提升精致感
+              fontSize: isLandscape ? s(66) : s(66), // 略微缩小字号提升精致感
               lineHeight: 1.7, // 增加行高，中英文混排更舒展
               opacity: 0.95,
               overflowY: "visible", // 去掉滑块，内容自动撑开
-              paddingBottom: "4vh" // 底部留白防挤压
+              paddingBottom: s(80) // 底部留白防挤压
             }}>
               <Markdown
                 options={{
