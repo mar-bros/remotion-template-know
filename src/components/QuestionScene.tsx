@@ -39,7 +39,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   globalAudio,
 }) => {
   const frame = useCurrentFrame();
-  const { s, vw, vv, isLandscape } = useScale();
+  const { s, vw, vh, vv, isLandscape } = useScale();
   const { fps } = useVideoConfig();
 
   // -- 执行时间轴计算阶段 (Timeline Phases) --
@@ -335,37 +335,21 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                flex: "none", // 仍然保持 none 不变！这是消灭两边各占50%虚空的核心解法！
-                width: isLandscape ? "auto" : "68%", // 横向仅占用内容所需宽度
-                position: isLandscape ? "relative" : "relative",
-                minHeight: isLandscape ? 0 : "auto",
+                flex: "none",
+                width: isLandscape ? "auto" : "100%",
+                height: isLandscape ? s(650) : vh(25), // 统一设定固定高度值，避免异形图片撑爆布局
+                position: "relative",
               }}>
-                {isLandscape ? (
-                  /* 横屏：填满高度但不截断，边框锁定在图片实际内容上 */
-                  <Img
-                    src={imageSrc}
-                    style={{
-                      height: "100%",
-                      width: "auto", // 宽度随比例缩放，不截断也不变形
-                      objectFit: "contain",
-                      borderRadius: "16px",
-                      boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
-                      border: `1px solid rgba(255,255,255,0.1)`,
-                    }}
-                  />
-                ) : (
-                  /* 竖屏：强制撑满 100% 宽度匹配选项，高度自适应杜绝变形 */
-                  <Img
-                    src={imageSrc}
-                    style={{
-                      width: "100%",
-                      height: "auto", // 关键：高度跟随比例自适应，不产生透明框或变形
-                      borderRadius: "16px",
-                      boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
-                      border: `1px solid rgba(255,255,255,0.1)`,
-                    }}
-                  />
-                )}
+                <Img
+                  src={imageSrc}
+                  style={{
+                    height: "100%",
+                    width: "auto", // 关键：设为 auto 让 Img 标签宽度紧贴图片内容，圆角才能在图片边缘生效
+                    objectFit: "contain",
+                    borderRadius: s(56), // 使用缩放后的圆角值，16px 在高分辨率下太小
+                    border: `2px solid rgba(255,255,255,0.1)`, // 增加微弱边框，让圆角在深色背景下可见
+                  }}
+                />
               </div>
             )}
 
