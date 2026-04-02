@@ -166,7 +166,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
           textShadow: "0 4px 12px rgba(0,0,0,0.6)",
           margin: 0,
           flex: 1,
-          textAlign: isLandscape ? "left" : "center" // 横屏通常左侧起步，竖屏绝对居中
+          textAlign: isLandscape ? "left" : "center", // 横屏通常左侧起步，竖屏绝对居中
+          whiteSpace: "pre-wrap",
         }}
       >
         {question.question}
@@ -275,8 +276,8 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
 
       {/* 声音触发层: 必须使用 Sequence 包裹 Audio 才能保证在时间轴完整播放，直接条件渲染会导致1帧后静音卸载 */}
       {globalAudio.questionPopSound && (
-        <Sequence from={0}>
-          <Audio src={resolveAudio(globalAudio.questionPopSound)!} />
+        <Sequence from={-1}>
+          <Audio src={resolveAudio(globalAudio.questionPopSound)!} trimBefore={20} />
         </Sequence>
       )}
       {globalAudio.countdownSound && (

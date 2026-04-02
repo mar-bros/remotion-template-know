@@ -102,6 +102,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
               lineHeight: 1.1,
               opacity: titleProgress,
               textShadow: "0 10px 40px rgba(0,0,0,0.8)",
+              whiteSpace: "pre-wrap",
             }}
           >
             {config.title}
@@ -112,9 +113,10 @@ export const IntroScene: React.FC<IntroSceneProps> = ({ config, theme }) => {
           <div
             style={{
               marginTop: s(60),
-              fontSize: vv(2),
+              fontSize: vv(3),
               fontWeight: 600,
               opacity: subtitleProgress,
+              whiteSpace: "pre-wrap",
             }}
           >
             {config.subtitle}
