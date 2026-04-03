@@ -277,12 +277,12 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       {/* 声音触发层: 必须使用 Sequence 包裹 Audio 才能保证在时间轴完整播放，直接条件渲染会导致1帧后静音卸载 */}
       {globalAudio.questionPopSound && (
         <Sequence from={0}>
-          <Audio src={resolveAudio(globalAudio.questionPopSound)!} trimBefore={20} volume={0.5} />
+          <Audio src={resolveAudio(globalAudio.questionPopSound)!} trimBefore={20} volume={0.3} />
         </Sequence>
       )}
       {globalAudio.countdownSound && (
         <Sequence from={countdownStartFrame} durationInFrames={question.countdownDuration}>
-          <Audio src={resolveAudio(globalAudio.countdownSound)!} volume={0.5} />
+          <Audio src={resolveAudio(globalAudio.countdownSound)!} volume={0.3} />
         </Sequence>
       )}
       {globalAudio.answerRevealSound && (
