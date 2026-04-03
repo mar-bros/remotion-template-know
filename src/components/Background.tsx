@@ -50,7 +50,7 @@ export const Background: React.FC<BackgroundProps> = ({ theme, customImage }) =>
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: "#030308", // Very deep dark-blue space base
+        backgroundColor: theme.backgroundColor,
         overflow: "hidden",
       }}
     >
