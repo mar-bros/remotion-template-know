@@ -42,6 +42,11 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   const { s, vw, vh, vv, isLandscape } = useScale();
   const { fps } = useVideoConfig();
 
+  // 用于测量和自动滚动解释内容
+  const explanationContainerRef = React.useRef<HTMLDivElement>(null);
+  const explanationContentRef = React.useRef<HTMLDivElement>(null);
+  const [explanationMeasurements, setExplanationMeasurements] = React.useState({ containerHeight: 0, contentHeight: 0 });
+
   // -- 执行时间轴计算阶段 (Timeline Phases) --
   // Enter 阶段: 题目登场、选项进入
   const countdownStartFrame = question.enterDuration;
@@ -54,6 +59,24 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
   const isCountingDown = frame >= countdownStartFrame && frame < revealStartFrame;
   const isRevealed = frame >= revealStartFrame;
   const isExplanation = frame >= explanationStartFrame;
+
+  // 依赖内容挂载后计算高度，从而进行自动滚动
+  React.useLayoutEffect(() => {
+    if (explanationContainerRef.current && explanationContentRef.current) {
+      const newContainerHeight = explanationContainerRef.current.clientHeight;
+      const newContentHeight = explanationContentRef.current.scrollHeight;
+
+      setExplanationMeasurements(prev => {
+        if (prev.containerHeight === newContainerHeight && prev.contentHeight === newContentHeight) {
+          return prev; // 阻止不必要的二次渲染
+        }
+        return {
+          containerHeight: newContainerHeight,
+          contentHeight: newContentHeight,
+        };
+      });
+    }
+  }, [isExplanation, question.explanation, isLandscape]); // 避免将返回新引用的 vw/vh 放入依赖项
 
   // -- 核心动画函数 (Animations) --
   // 1. 登场动画（控制组件首次上浮和显示）
@@ -69,6 +92,24 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
     fps,
     config: { damping: 14, mass: 0.8 },
   });
+
+  // 解析阶段的滚动计算 (自动向上滚动，不显示滚动条)
+  const explanationDuration = question.durationInFrames - explanationStartFrame;
+  const framesSinceExplanation = Math.max(0, frame - explanationStartFrame);
+  // 等待1.5秒后开始滚动，结尾预留1秒
+  const scrollWaitFrames = fps * 3;
+  const scrollDurationFrames = Math.max(0, explanationDuration - scrollWaitFrames - fps * 1);
+  const maxScroll = Math.max(0, explanationMeasurements.contentHeight - explanationMeasurements.containerHeight);
+
+  let currentScroll = 0;
+  if (framesSinceExplanation > scrollWaitFrames && scrollDurationFrames > 0 && maxScroll > 0) {
+    currentScroll = interpolate(
+      framesSinceExplanation,
+      [scrollWaitFrames, scrollWaitFrames + scrollDurationFrames],
+      [0, maxScroll],
+      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+    );
+  }
 
   // 3. 场景退出逻辑（处理该题目和下一题的转场淡出）
   const isTransitioningOut =
@@ -363,10 +404,12 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
       {isExplanation && question.explanation && (
         <AbsoluteFill style={{ justifyContent: "flex-end", zIndex: 20 }}>
           <div
+            ref={explanationContainerRef}
             style={{
               width: "100%",
               height: "auto", // 根据内容动态控制高度
               minHeight: isLandscape ? "35%" : "30%", // 保持最低美感高度
+              maxHeight: isLandscape ? "75%" : "80%", // 设置最大高度以触发滚动
               background: "rgba(0,0,0,0.7)", // 稍微加深背景以提升高级感
               backdropFilter: "blur(50px)",
               WebkitBackdropFilter: "blur(50px)",
@@ -382,17 +425,22 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               color: theme.textColor,
               transform: `translateY(${interpolate(explanationSpring, [0, 1], [100, 0])}%)`,
               opacity: transitionOutOpacity,
+              overflow: "hidden", // 隐藏原生滚动条
             }}
           >
             {/* 抽屉扶手小条装饰 */}
-            <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: s(20) }} />
-            <div style={{
-              fontSize: isLandscape ? s(45) : s(66),
-              lineHeight: 1.7, // 增加行高，中英文混排更舒展
-              opacity: 0.95,
-              overflowY: "visible", // 去掉滑块，内容自动撑开
-              paddingBottom: s(600) // 底部留白防挤压
-            }}>
+            <div style={{ width: "60px", height: "6px", background: "rgba(255,255,255,0.2)", borderRadius: "3px", alignSelf: "center", marginBottom: s(20), flexShrink: 0 }} />
+            <div
+              ref={explanationContentRef}
+              style={{
+                fontSize: isLandscape ? s(45) : s(66),
+                lineHeight: 1.7, // 增加行高，中英文混排更舒展
+                opacity: 0.95,
+                paddingBottom: s(600), // 原来为 s(600) 防挤压，现在加入了自动滚动，改为合适留白
+                transform: `translateY(-${currentScroll}px)`, // 核心驱动滚动
+                width: "100%",
+              }}
+            >
               <Markdown
                 options={{
                   overrides: {
