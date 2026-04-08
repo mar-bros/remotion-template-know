@@ -391,7 +391,7 @@ export const QuestionScene: React.FC<QuestionSceneProps> = ({
               lineHeight: 1.7, // 增加行高，中英文混排更舒展
               opacity: 0.95,
               overflowY: "visible", // 去掉滑块，内容自动撑开
-              paddingBottom: s(80) // 底部留白防挤压
+              paddingBottom: s(600) // 底部留白防挤压
             }}>
               <Markdown
                 options={{

@@ -8,7 +8,7 @@ import { loadFont as loadNotoSansSC } from "@remotion/google-fonts/NotoSansSC";
 import { buildTimeline, getTotalFrames } from "./utils/timing";
 import { deepMerge } from "./utils/merge";
 import { KnowVideo } from "./compositions/KnowVideo";
-import exampleData from "./data/example.json";
+import exampleData from "./data/exampleH.json";
 
 export type KnowVideoProps = KnowConfig & {
   audioDurations: Record<string, number>;
