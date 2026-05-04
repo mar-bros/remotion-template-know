@@ -11,7 +11,7 @@ npx remotion render
 
 ## 效果
 
-<video src="https://github.com/user-attachments/assets/9064c11f-b523-4033-8eaf-0a1d78b0b25d" width="100%" controls>
+<video src="https://github.com/user-attachments/assets/81e23d05-c240-4ec9-9b13-34cf1e8cb15d" width="100%" controls>
   您的浏览器不支持视频播放。
 </video>
 
